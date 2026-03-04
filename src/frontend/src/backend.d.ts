@@ -1,0 +1,119 @@
+import type { Principal } from "@icp-sdk/core/principal";
+export interface Some<T> {
+    __kind__: "Some";
+    value: T;
+}
+export interface None {
+    __kind__: "None";
+}
+export type Option<T> = Some<T> | None;
+export interface FAQEntry {
+    keywords: Array<string>;
+    response: string;
+}
+export interface UserProfile {
+    studentId?: string;
+    name: string;
+    role: string;
+}
+export type Time = bigint;
+export interface Attendance {
+    subjectId: string;
+    percentage: number;
+}
+export interface Marks {
+    marks: bigint;
+    subjectId: string;
+    examType: string;
+}
+export interface AcademicRecord {
+    marks: Array<Marks>;
+    subjects: Array<Subject>;
+    feesDue: Array<FeesDue>;
+    exams: Array<Exam>;
+    attendance: Array<Attendance>;
+    student: Student;
+}
+export interface FeeStructure {
+    yearSemesterBreakdown: Array<{
+        yearOrSemester: string;
+        amount: number;
+    }>;
+    course: Course;
+}
+export interface Course {
+    branch: string;
+    durationYears: number;
+    degree: Degree;
+}
+export interface Exam {
+    date: Time;
+    subjectId: string;
+    examId: string;
+    examType: string;
+}
+export interface FacultyMember {
+    name: string;
+    subjectsTaught: Array<string>;
+    department: string;
+    qualification: string;
+}
+export interface FeesDue {
+    dueDate: Time;
+    yearSemester: string;
+    amount: number;
+}
+export interface Subject {
+    semester: bigint;
+    code: string;
+    name: string;
+    year: bigint;
+    subjectId: string;
+    department: string;
+}
+export interface Student {
+    studentId: string;
+    degree: Degree;
+    department: string;
+    lastName: string;
+    firstName: string;
+}
+export enum Degree {
+    mba = "mba",
+    bTech = "bTech",
+    mTech = "mTech"
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
+export interface backendInterface {
+    addOrUpdateAcademicRecord(studentId: string, record: AcademicRecord): Promise<void>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    getAllAcademicRecords(): Promise<Array<AcademicRecord>>;
+    getAllCourses(): Promise<Array<Course>>;
+    getAllFeeStructures(): Promise<Array<FeeStructure>>;
+    getAttendanceByStudent(studentId: string): Promise<Array<Attendance>>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    getChatbotResponse(message: string): Promise<string>;
+    getDepartmentInfo(department: string): Promise<{
+        courses: Array<Course>;
+        subjects: Array<Subject>;
+        faculty: Array<FacultyMember>;
+    }>;
+    getExamTimetableByDepartment(department: string): Promise<Array<Exam>>;
+    getFAQEntries(): Promise<Array<FAQEntry>>;
+    getFacultyByDepartment(department: string): Promise<Array<FacultyMember>>;
+    getFacultyDirectory(): Promise<Array<FacultyMember>>;
+    getFeeStructureByCourse(course: Course): Promise<FeeStructure>;
+    getFeesDueByStudent(studentId: string): Promise<Array<FeesDue>>;
+    getMarksByStudent(studentId: string): Promise<Array<Marks>>;
+    getOwnRecord(): Promise<AcademicRecord>;
+    getStudentRecord(studentId: string): Promise<AcademicRecord>;
+    getSubjectsByDepartment(department: string): Promise<Array<Subject>>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isCallerAdmin(): Promise<boolean>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+}
