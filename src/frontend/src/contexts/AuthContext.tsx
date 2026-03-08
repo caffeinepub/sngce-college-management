@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-export type UserRole = "student" | "staff" | null;
+export type UserRole = "student" | "staff" | "admin" | null;
 
 interface AuthState {
   isLoggedIn: boolean;

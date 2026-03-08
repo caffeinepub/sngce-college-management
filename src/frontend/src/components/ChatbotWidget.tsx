@@ -8,6 +8,21 @@ interface Message {
   id: string;
   role: "user" | "bot";
   text: string;
+  isMulti?: boolean;
+}
+
+/** Detect if a message contains multiple distinct questions */
+function detectMultipleQueries(text: string): boolean {
+  const questionMarks = (text.match(/\?/g) || []).length;
+  if (questionMarks >= 2) return true;
+  const numbered = /\b[1-9]\.\s/.test(text) && text.includes("?");
+  if (numbered) return true;
+  const keywords =
+    /\b(also|and also|what about|plus|additionally|another question|second question)\b/i.test(
+      text,
+    );
+  if (keywords && text.includes("?")) return true;
+  return false;
 }
 
 const WELCOME: Message = {
@@ -83,7 +98,13 @@ export function ChatbotWidget() {
   const dispatchMessage = async (text: string) => {
     if (!text || isPending) return;
 
-    const userMsg: Message = { id: `${Date.now()}`, role: "user", text };
+    const isMulti = detectMultipleQueries(text);
+    const userMsg: Message = {
+      id: `${Date.now()}`,
+      role: "user",
+      text,
+      isMulti,
+    };
     setMessages((prev) => [...prev, userMsg]);
     setIsPending(true);
 
@@ -219,31 +240,48 @@ export function ChatbotWidget() {
               style={{ scrollBehavior: "smooth" }}
             >
               <div className="flex flex-col gap-3">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    {msg.role === "bot" && (
-                      <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center mr-1.5 mt-0.5 flex-shrink-0">
-                        <Bot size={12} className="text-foreground/70" />
+                {messages.map((msg, msgIdx) => {
+                  // A user message with isMulti: show the badge while the very next message is pending
+                  const isLastUserMsg =
+                    msg.role === "user" &&
+                    msgIdx === messages.length - 1 &&
+                    isPending;
+                  const showMultiBadge = msg.isMulti && isLastUserMsg;
+
+                  return (
+                    <div key={msg.id} className="flex flex-col">
+                      <div
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        {msg.role === "bot" && (
+                          <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center mr-1.5 mt-0.5 flex-shrink-0">
+                            <Bot size={12} className="text-foreground/70" />
+                          </div>
+                        )}
+                        <div
+                          className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                            msg.role === "user"
+                              ? "bg-foreground text-background rounded-br-sm"
+                              : "glass-sm text-foreground rounded-bl-sm"
+                          }`}
+                        >
+                          {msg.role === "bot" ? (
+                            <BotText text={msg.text} />
+                          ) : (
+                            msg.text
+                          )}
+                        </div>
                       </div>
-                    )}
-                    <div
-                      className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-foreground text-background rounded-br-sm"
-                          : "glass-sm text-foreground rounded-bl-sm"
-                      }`}
-                    >
-                      {msg.role === "bot" ? (
-                        <BotText text={msg.text} />
-                      ) : (
-                        msg.text
+                      {showMultiBadge && (
+                        <div className="flex justify-end mt-1">
+                          <span className="glass-sm text-[10px] text-muted-foreground px-2 py-0.5 rounded-full flex items-center gap-1">
+                            📋 Organising multiple queries…
+                          </span>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {isPending && (
                   <div className="flex justify-start items-center gap-1.5">

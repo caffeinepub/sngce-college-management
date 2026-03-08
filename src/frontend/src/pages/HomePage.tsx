@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
+  Bot,
   ChevronRight,
   DollarSign,
   GraduationCap,
@@ -8,13 +9,32 @@ import {
   MapPin,
   MessageCircle,
   Phone,
+  Send,
   ShieldCheck,
+  Sparkles,
   UserCircle,
   Users,
 } from "lucide-react";
+import { useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 
+const QUICK_CHIPS = [
+  { label: "Courses 📚", query: "Courses" },
+  { label: "Fees 💰", query: "Fees" },
+  { label: "Admissions 🎓", query: "Admissions" },
+  { label: "Contact 📞", query: "Contact" },
+];
+
 const navCards = [
+  {
+    to: "#chatbot",
+    icon: MessageCircle,
+    label: "AI Assistant",
+    desc: "Get instant answers",
+    ocid: "home.chatbot.card",
+    isChatbot: true,
+    isHighlighted: true,
+  },
   {
     to: "/courses",
     icon: BookOpen,
@@ -50,19 +70,60 @@ const navCards = [
     desc: "Manage student records",
     ocid: "home.staff.card",
   },
-  {
-    to: "#chatbot",
-    icon: MessageCircle,
-    label: "AI Assistant",
-    desc: "Get instant answers",
-    ocid: "home.chatbot.card",
-    isChatbot: true,
-  },
 ];
+
+function openChatbotWithMessage(message: string) {
+  // Step 1: Open the chatbot widget
+  const openBtn = document.querySelector<HTMLButtonElement>(
+    '[data-ocid="chatbot.open_modal_button"]',
+  );
+  if (openBtn) {
+    openBtn.click();
+  }
+
+  // Step 2: After a short delay, inject the message and submit
+  setTimeout(() => {
+    const chatInput = document.querySelector<HTMLInputElement>(
+      '[data-ocid="chatbot.input"]',
+    );
+    if (chatInput) {
+      // Use React's native input value setter so React state updates properly
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        "value",
+      )?.set;
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(chatInput, message);
+        chatInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      // Small additional delay for React to sync state before clicking submit
+      setTimeout(() => {
+        const submitBtn = document.querySelector<HTMLButtonElement>(
+          '[data-ocid="chatbot.submit_button"]',
+        );
+        submitBtn?.click();
+      }, 80);
+    }
+  }, 120);
+}
 
 export function HomePage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [heroInput, setHeroInput] = useState("");
+  const heroInputRef = useRef<HTMLInputElement>(null);
+
+  const handleHeroSubmit = () => {
+    const text = heroInput.trim();
+    if (!text) return;
+    setHeroInput("");
+    openChatbotWithMessage(text);
+  };
+
+  const handleHeroChip = (query: string) => {
+    openChatbotWithMessage(query);
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -88,7 +149,7 @@ export function HomePage() {
       </div>
 
       {/* Hero */}
-      <section className="relative pt-28 pb-16 px-4 sm:px-6 text-center">
+      <section className="relative pt-28 pb-10 px-4 sm:px-6 text-center">
         <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 glass-sm px-4 py-1.5 rounded-full text-xs font-medium text-muted-foreground mb-6">
             <MapPin size={12} />
@@ -127,6 +188,97 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* ── AI Chatbot Hero ── */}
+      <section className="px-4 sm:px-6 pb-10">
+        <div className="max-w-5xl mx-auto">
+          {/* Outer glow wrapper */}
+          <div
+            className="rounded-2xl p-[1px]"
+            style={{
+              background: isDark
+                ? "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.14) 100%)"
+                : "linear-gradient(135deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.80) 100%)",
+              boxShadow: isDark
+                ? "0 0 48px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.45)"
+                : "0 0 48px rgba(255,255,255,0.55), 0 12px 40px rgba(0,0,0,0.10)",
+            }}
+          >
+            <div
+              className="glass rounded-2xl px-6 sm:px-10 py-8 sm:py-10 flex flex-col gap-6"
+              style={{ borderRadius: "15px" }}
+            >
+              {/* Header row */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div
+                  className="glass-sm w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse-glow"
+                  style={{
+                    background: isDark
+                      ? "rgba(255,255,255,0.12)"
+                      : "rgba(255,255,255,0.75)",
+                  }}
+                >
+                  <Bot size={24} className="text-foreground" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-display font-bold text-foreground text-xl sm:text-2xl leading-tight">
+                      SNGCE AI Assistant
+                    </h2>
+                    <span className="inline-flex items-center gap-1 glass-sm px-2 py-0.5 rounded-full text-[10px] font-medium text-muted-foreground">
+                      <Sparkles size={10} />
+                      Gemini AI
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-sm mt-0.5">
+                    Ask me anything — courses, fees, admissions, faculty, or
+                    navigate the portal
+                  </p>
+                </div>
+              </div>
+
+              {/* Input row */}
+              <div className="flex gap-2 sm:gap-3">
+                <input
+                  ref={heroInputRef}
+                  type="text"
+                  value={heroInput}
+                  onChange={(e) => setHeroInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleHeroSubmit()}
+                  placeholder="e.g. What B.Tech courses does SNGCE offer?"
+                  data-ocid="home.chatbot_hero.input"
+                  className="flex-1 glass-sm px-4 py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleHeroSubmit}
+                  disabled={!heroInput.trim()}
+                  data-ocid="home.chatbot_hero.submit_button"
+                  className="glass-btn px-4 sm:px-5 py-3 flex items-center gap-2 text-foreground font-medium disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                  aria-label="Ask the AI assistant"
+                >
+                  <Send size={16} />
+                  <span className="hidden sm:inline">Ask now</span>
+                </button>
+              </div>
+
+              {/* Quick chips */}
+              <div className="flex flex-wrap gap-2">
+                {QUICK_CHIPS.map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => handleHeroChip(chip.query)}
+                    className="glass-sm px-3.5 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-medium"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Quick Nav Cards */}
       <section className="px-4 sm:px-6 pb-16">
         <div className="max-w-5xl mx-auto">
@@ -137,7 +289,9 @@ export function HomePage() {
             {navCards.map((card) => {
               const Icon = card.icon;
               const CardContent = (
-                <div className="glass p-5 flex flex-col gap-3 group hover:scale-[1.02] transition-transform duration-200 cursor-pointer h-full">
+                <div
+                  className={`glass p-5 flex flex-col gap-3 group hover:scale-[1.02] transition-transform duration-200 cursor-pointer h-full${card.isHighlighted ? " border border-foreground/20" : ""}`}
+                >
                   <div className="glass-sm w-10 h-10 rounded-xl flex items-center justify-center group-hover:bg-foreground/10 transition-colors">
                     <Icon size={20} className="text-foreground/70" />
                   </div>

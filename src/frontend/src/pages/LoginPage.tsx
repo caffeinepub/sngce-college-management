@@ -5,6 +5,7 @@ import {
   GraduationCap,
   Info,
   LogIn,
+  ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,9 +14,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 
 // Helper to read tab from URL
-function getTabFromSearch(): "student" | "staff" {
+function getTabFromSearch(): "student" | "staff" | "admin" {
   const params = new URLSearchParams(window.location.search);
-  return params.get("tab") === "staff" ? "staff" : "student";
+  const tab = params.get("tab");
+  if (tab === "staff") return "staff";
+  if (tab === "admin") return "admin";
+  return "student";
 }
 
 // Demo credentials
@@ -45,13 +49,17 @@ const DEMO_STAFF: Record<string, { password: string; name: string }> = {
   STAFF002: { password: "pass123", name: "Prof. Suja Thomas" },
 };
 
+const DEMO_ADMIN: Record<string, { password: string; name: string }> = {
+  ADMIN001: { password: "admin123", name: "Principal Admin" },
+};
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoggedIn, role } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [activeTab, setActiveTab] = useState<"student" | "staff">(
+  const [activeTab, setActiveTab] = useState<"student" | "staff" | "admin">(
     getTabFromSearch,
   );
   const [id, setId] = useState("");
@@ -63,9 +71,9 @@ export function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (isLoggedIn) {
-      navigate({
-        to: role === "student" ? "/student-dashboard" : "/staff-dashboard",
-      });
+      if (role === "student") navigate({ to: "/student-dashboard" });
+      else if (role === "admin") navigate({ to: "/admin-dashboard" });
+      else navigate({ to: "/staff-dashboard" });
     }
   }, [isLoggedIn, role, navigate]);
 
@@ -86,6 +94,16 @@ export function LoginPage() {
       login("student", student.name, id.toUpperCase());
       toast.success(`Welcome back, ${student.name}!`);
       navigate({ to: "/student-dashboard" });
+    } else if (activeTab === "admin") {
+      const admin = DEMO_ADMIN[id.toUpperCase()];
+      if (!admin || admin.password !== password) {
+        setError("Invalid Admin ID or password.");
+        setLoading(false);
+        return;
+      }
+      login("admin", admin.name);
+      toast.success(`Welcome, ${admin.name}!`);
+      navigate({ to: "/admin-dashboard" });
     } else {
       const staff = DEMO_STAFF[id.toUpperCase()];
       if (!staff || staff.password !== password) {
@@ -132,6 +150,8 @@ export function LoginPage() {
             <div className="glass-sm w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
               {activeTab === "student" ? (
                 <GraduationCap size={24} className="text-foreground/70" />
+              ) : activeTab === "admin" ? (
+                <ShieldAlert size={24} className="text-foreground/70" />
               ) : (
                 <ShieldCheck size={24} className="text-foreground/70" />
               )}
@@ -182,6 +202,24 @@ export function LoginPage() {
               <ShieldCheck size={15} />
               Staff
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("admin");
+                setError("");
+                setId("");
+                setPassword("");
+              }}
+              data-ocid="login.admin.tab"
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "admin"
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <ShieldAlert size={15} />
+              Admin
+            </button>
           </div>
 
           {/* Form */}
@@ -191,7 +229,11 @@ export function LoginPage() {
                 htmlFor="user-id"
                 className="text-xs font-medium text-muted-foreground mb-1.5 block"
               >
-                {activeTab === "student" ? "Student ID" : "Staff ID"}
+                {activeTab === "student"
+                  ? "Student ID"
+                  : activeTab === "admin"
+                    ? "Admin ID"
+                    : "Staff ID"}
               </label>
               <input
                 id="user-id"
@@ -199,7 +241,11 @@ export function LoginPage() {
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 placeholder={
-                  activeTab === "student" ? "e.g. STU001" : "e.g. STAFF001"
+                  activeTab === "student"
+                    ? "e.g. STU001"
+                    : activeTab === "admin"
+                      ? "e.g. ADMIN001"
+                      : "e.g. STAFF001"
                 }
                 data-ocid="login.id.input"
                 required
@@ -299,6 +345,29 @@ export function LoginPage() {
                 ))}
                 <p className="text-muted-foreground/50 text-[10px] mt-1">
                   Password: pass123 for all
+                </p>
+              </div>
+            ) : activeTab === "admin" ? (
+              <div className="flex flex-col gap-1 text-xs">
+                {Object.entries(DEMO_ADMIN).map(([sid, s]) => (
+                  <button
+                    key={sid}
+                    type="button"
+                    onClick={() => {
+                      setId(sid);
+                      setPassword(s.password);
+                    }}
+                    className="flex items-center justify-between hover:text-foreground text-muted-foreground transition-colors group"
+                  >
+                    <span className="font-mono">{sid}</span>
+                    <span className="text-muted-foreground/60">{s.name}</span>
+                    <span className="glass-sm px-2 py-0.5 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                      Use
+                    </span>
+                  </button>
+                ))}
+                <p className="text-muted-foreground/50 text-[10px] mt-1">
+                  Password: admin123
                 </p>
               </div>
             ) : (

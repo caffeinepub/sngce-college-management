@@ -171,10 +171,10 @@ const goodbyeResponses = [
 ];
 
 const unknownResponses = [
-  "Hmm, I'm not quite sure about that specific detail. Your best bet would be to contact the college directly at info@sngce.ac.in or call +91 485 2234567. Is there anything else I can help with?",
-  "That's a bit outside my knowledge base right now! For accurate info on that, I'd recommend visiting the college office or emailing info@sngce.ac.in. Can I help with something else?",
-  "I don't have that specific information handy. But feel free to reach out to the SNGCE admin office — they'll be able to help. Anything else I can assist with?",
-  "Good question! I'm not 100% sure about that one. For detailed info, the college admin team at info@sngce.ac.in would be your best resource. What else can I help you with?",
+  "Great question! Let me think about that. SNGCE is a KTU-affiliated engineering college in Kerala — whatever you need to know about courses, career, campus, education, or anything else, I'm here for it. Could you give me a bit more context so I can give you a precise answer?",
+  "Interesting! I want to make sure I give you the most useful answer. Are you asking about SNGCE specifically, or is this a general education/engineering question? Either way, I've got you covered!",
+  "I'm on it! That's a broad topic — could you tell me a bit more so I can tailor the answer? Or if you want, I can give you a general overview right now.",
+  "Let me help you with that! To give you the best answer, could you share a little more detail about what you're looking for? I can cover anything from SNGCE info to engineering topics to career advice.",
 ];
 
 // ── Main Response Engine ────────────────────────────────────────────────────
@@ -680,7 +680,7 @@ export function generateResponse(
   // ── Bus / Transport ──
   if (contains(msg, "bus", "transport", "how to reach", "route", "commute")) {
     return {
-      text: "SNGCE is located in Kadayirippu, Ernakulam. There are regular KSRTC and private buses connecting the campus to Koothattukulam and Ernakulam town. The college also has its own transport arrangements for nearby routes. For the latest bus schedule, check the college notice board.",
+      text: "SNGCE is located in Kadayirippu, Kolenchery, Ernakulam. There are regular KSRTC and private buses connecting the campus to Koothattukulam and Ernakulam town. The nearest major town is Kolenchery (~5 km). The college also runs its own bus service covering several routes in Ernakulam district for students and staff.",
     };
   }
 
@@ -713,7 +713,7 @@ export function generateResponse(
     )
   ) {
     return {
-      text: "SNGCE is managed by the **Sree Narayana Gurukulam Trust**, an institution deeply committed to quality education in the spirit of Sree Narayana Guru's philosophy of 'Education for Liberation'. The college is led by an experienced principal and a dedicated management team. For specific names and contact, please visit the college website or call +91 485 2234567.",
+      text: "SNGCE is managed by the **Sree Narayana Gurukulam Trust**, an institution deeply committed to quality education in the spirit of Sree Narayana Guru's philosophy of 'Education for Liberation'. The college is led by an experienced principal and a dedicated management team. You can reach the college at **0484-2597800** or email **info@sngce.ac.in** for direct contact.",
     };
   }
 

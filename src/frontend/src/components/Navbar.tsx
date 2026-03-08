@@ -1,5 +1,14 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LogOut, Menu, Moon, Sun, User, X } from "lucide-react";
+import {
+  Lock,
+  LogOut,
+  Menu,
+  Moon,
+  ShieldAlert,
+  Sun,
+  User,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
@@ -54,6 +63,34 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {(role === "staff" || role === "admin") && (
+            <Link
+              to="/classified"
+              data-ocid="nav.classified.link"
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                isActive("/classified")
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+              }`}
+            >
+              <Lock size={13} />
+              Classified
+            </Link>
+          )}
+          {role === "admin" && (
+            <Link
+              to="/admin-dashboard"
+              data-ocid="nav.admin.link"
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                isActive("/admin-dashboard")
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+              }`}
+            >
+              <ShieldAlert size={13} />
+              Admin Panel
+            </Link>
+          )}
         </div>
 
         {/* Right controls */}
@@ -74,7 +111,11 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 to={
-                  role === "student" ? "/student-dashboard" : "/staff-dashboard"
+                  role === "student"
+                    ? "/student-dashboard"
+                    : role === "admin"
+                      ? "/admin-dashboard"
+                      : "/staff-dashboard"
                 }
                 data-ocid="nav.dashboard.link"
                 className="glass-btn px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground"
@@ -133,6 +174,36 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {(role === "staff" || role === "admin") && (
+            <Link
+              to="/classified"
+              onClick={() => setMobileOpen(false)}
+              data-ocid="nav.mobile.classified.link"
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                isActive("/classified")
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+              }`}
+            >
+              <Lock size={13} />
+              Classified
+            </Link>
+          )}
+          {role === "admin" && (
+            <Link
+              to="/admin-dashboard"
+              onClick={() => setMobileOpen(false)}
+              data-ocid="nav.mobile.admin.link"
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                isActive("/admin-dashboard")
+                  ? "bg-foreground/10 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+              }`}
+            >
+              <ShieldAlert size={13} />
+              Admin Panel
+            </Link>
+          )}
         </div>
       )}
     </header>

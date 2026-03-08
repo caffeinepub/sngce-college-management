@@ -10,6 +10,8 @@ import {
 import { Layout } from "./components/Layout";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AdminDashboard } from "./pages/AdminDashboard";
+import { ClassifiedPage } from "./pages/ClassifiedPage";
 import { CoursesPage } from "./pages/CoursesPage";
 import { FacultyPage } from "./pages/FacultyPage";
 import { FeesPage } from "./pages/FeesPage";
@@ -94,6 +96,20 @@ const staffDashboardRoute = createRoute({
   component: StaffDashboard,
 });
 
+// Admin dashboard
+const adminDashboardRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/admin-dashboard",
+  component: AdminDashboard,
+});
+
+// Classified page
+const classifiedRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/classified",
+  component: ClassifiedPage,
+});
+
 // Build route tree
 const routeTree = rootRoute.addChildren([
   splashRoute,
@@ -105,6 +121,8 @@ const routeTree = rootRoute.addChildren([
     loginRoute,
     studentDashboardRoute,
     staffDashboardRoute,
+    adminDashboardRoute,
+    classifiedRoute,
   ]),
 ]);
 
