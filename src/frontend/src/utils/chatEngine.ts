@@ -1,9 +1,3 @@
-/**
- * SNGCE Chat Engine
- * Comprehensive, human-like response system for the SNGCE College Assistant.
- * Handles navigation, college info, student queries, general conversation, and more.
- */
-
 export interface ChatMessage {
   role: "user" | "model";
   text: string;
@@ -13,8 +7,6 @@ export interface BotResponse {
   text: string;
   redirect?: string;
 }
-
-// ── Utilities ──────────────────────────────────────────────────────────────
 
 function normalize(text: string): string {
   return text
@@ -30,8 +22,6 @@ function contains(msg: string, ...terms: string[]): boolean {
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-
-// ── Knowledge Base ─────────────────────────────────────────────────────────
 
 const COLLEGE_INFO = {
   name: "Sree Narayana Gurukulam College of Engineering",
@@ -141,8 +131,6 @@ const CONTACT_INFO = `You can reach SNGCE at:
 - **Email:** info@sngce.ac.in
 - **Website:** www.sngce.ac.in`;
 
-// ── Response Categories ─────────────────────────────────────────────────────
-
 const greetingResponses = [
   "Hey there! 👋 I'm SNGCE Assistant, your college guide. How can I help you today?",
   "Hi! Welcome to SNGCE's virtual assistant. What would you like to know?",
@@ -177,8 +165,6 @@ const unknownResponses = [
   "Let me help you with that! To give you the best answer, could you share a little more detail about what you're looking for? I can cover anything from SNGCE info to engineering topics to career advice.",
 ];
 
-// ── Main Response Engine ────────────────────────────────────────────────────
-
 export function generateResponse(
   message: string,
   history: ChatMessage[],
@@ -186,7 +172,6 @@ export function generateResponse(
   const msg = normalize(message);
   const historyLength = history.length;
 
-  // ── Greetings ──
   if (
     contains(
       msg,
@@ -206,7 +191,6 @@ export function generateResponse(
     return { text: pick(greetingResponses) };
   }
 
-  // ── How are you ──
   if (
     contains(
       msg,
@@ -220,7 +204,6 @@ export function generateResponse(
     return { text: pick(howAreYouResponses) };
   }
 
-  // ── Bot identity ──
   if (
     contains(
       msg,
@@ -237,7 +220,6 @@ export function generateResponse(
     };
   }
 
-  // ── Thanks ──
   if (
     contains(
       msg,
@@ -253,12 +235,10 @@ export function generateResponse(
     return { text: pick(thankYouResponses) };
   }
 
-  // ── Goodbye ──
   if (contains(msg, "bye", "goodbye", "see you", "later", "take care", "cya")) {
     return { text: pick(goodbyeResponses) };
   }
 
-  // ── Navigation: Home ──
   if (
     contains(
       msg,
@@ -276,7 +256,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Courses ──
   if (
     contains(
       msg,
@@ -296,7 +275,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Fees ──
   if (
     contains(
       msg,
@@ -315,7 +293,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Faculty ──
   if (
     contains(
       msg,
@@ -334,7 +311,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Login ──
   if (
     contains(
       msg,
@@ -352,7 +328,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Staff ──
   if (
     contains(
       msg,
@@ -369,7 +344,6 @@ export function generateResponse(
     };
   }
 
-  // ── Navigation: Student Dashboard ──
   if (
     contains(
       msg,
@@ -389,7 +363,6 @@ export function generateResponse(
     };
   }
 
-  // ── About SNGCE ──
   if (
     contains(
       msg,
@@ -411,7 +384,6 @@ export function generateResponse(
     };
   }
 
-  // ── Courses info (not navigation) ──
   if (
     contains(
       msg,
@@ -434,7 +406,6 @@ export function generateResponse(
     };
   }
 
-  // ── Fees info (not navigation) ──
   if (
     contains(
       msg,
@@ -454,7 +425,6 @@ export function generateResponse(
     };
   }
 
-  // ── Faculty info (not navigation) ──
   if (
     contains(
       msg,
@@ -473,7 +443,6 @@ export function generateResponse(
     };
   }
 
-  // ── Admission ──
   if (
     contains(
       msg,
@@ -493,14 +462,12 @@ export function generateResponse(
     };
   }
 
-  // ── Departments ──
   if (contains(msg, "department", "which department", "list of department")) {
     return {
       text: `SNGCE has **${COLLEGE_INFO.departments} departments**:\n${DEPARTMENTS.map((d, i) => `${i + 1}. ${d}`).join("\n")}\n\nEach department has well-qualified faculty and modern lab facilities. 🏛️`,
     };
   }
 
-  // ── Hostel ──
   if (
     contains(
       msg,
@@ -516,7 +483,6 @@ export function generateResponse(
     };
   }
 
-  // ── Facilities ──
   if (
     contains(
       msg,
@@ -536,7 +502,6 @@ export function generateResponse(
     };
   }
 
-  // ── Placement ──
   if (
     contains(
       msg,
@@ -554,7 +519,6 @@ export function generateResponse(
     };
   }
 
-  // ── Contact ──
   if (
     contains(
       msg,
@@ -572,7 +536,6 @@ export function generateResponse(
     return { text: CONTACT_INFO };
   }
 
-  // ── Affiliation / University ──
   if (
     contains(
       msg,
@@ -589,7 +552,6 @@ export function generateResponse(
     };
   }
 
-  // ── Attendance ──
   if (
     contains(
       msg,
@@ -605,7 +567,6 @@ export function generateResponse(
     };
   }
 
-  // ── Marks / Results ──
   if (
     contains(
       msg,
@@ -624,7 +585,6 @@ export function generateResponse(
     };
   }
 
-  // ── Exam Timetable ──
   if (
     contains(msg, "exam", "timetable", "schedule", "when is exam", "exam date")
   ) {
@@ -633,7 +593,6 @@ export function generateResponse(
     };
   }
 
-  // ── Fees Due ──
   if (
     contains(
       msg,
@@ -649,14 +608,12 @@ export function generateResponse(
     };
   }
 
-  // ── KTU / Syllabus ──
   if (contains(msg, "syllabus", "curriculum", "ktu syllabus", "subject list")) {
     return {
       text: "SNGCE follows the **KTU (APJ Abdul Kalam Technological University)** syllabus. The curriculum is regularly updated to match industry trends. You can find the official syllabus on the KTU website: ktu.edu.in. Is there a specific subject or semester you're curious about?",
     };
   }
 
-  // ── Extracurricular / Clubs ──
   if (
     contains(
       msg,
@@ -677,14 +634,12 @@ export function generateResponse(
     };
   }
 
-  // ── Bus / Transport ──
   if (contains(msg, "bus", "transport", "how to reach", "route", "commute")) {
     return {
       text: "SNGCE is located in Kadayirippu, Kolenchery, Ernakulam. There are regular KSRTC and private buses connecting the campus to Koothattukulam and Ernakulam town. The nearest major town is Kolenchery (~5 km). The college also runs its own bus service covering several routes in Ernakulam district for students and staff.",
     };
   }
 
-  // ── Library ──
   if (
     contains(
       msg,
@@ -700,7 +655,6 @@ export function generateResponse(
     };
   }
 
-  // ── Principal / Management ──
   if (
     contains(
       msg,
@@ -717,7 +671,6 @@ export function generateResponse(
     };
   }
 
-  // ── Jokes ──
   if (
     contains(
       msg,
@@ -738,7 +691,6 @@ export function generateResponse(
     return { text: pick(jokes) };
   }
 
-  // ── Motivation / Inspiration ──
   if (
     contains(
       msg,
@@ -761,7 +713,6 @@ export function generateResponse(
     return { text: pick(quotes) };
   }
 
-  // ── What can you do / help ──
   if (
     contains(
       msg,
@@ -778,7 +729,6 @@ export function generateResponse(
     };
   }
 
-  // ── Context-aware follow-up: if last bot message mentioned courses ──
   if (historyLength > 0) {
     const lastBotMsg = [...history].reverse().find((h) => h.role === "model");
     if (lastBotMsg) {
@@ -859,6 +809,5 @@ export function generateResponse(
     }
   }
 
-  // ── Fallback ──
   return { text: pick(unknownResponses) };
 }

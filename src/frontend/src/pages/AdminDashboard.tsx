@@ -54,7 +54,6 @@ export function AdminDashboard() {
 
   const [items, setItems] = useState<ClassifiedItem[]>(loadItems);
 
-  // Form state
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [content, setContent] = useState("");
@@ -129,7 +128,7 @@ export function AdminDashboard() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{

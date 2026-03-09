@@ -19,15 +19,15 @@ import { useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 
 const QUICK_CHIPS = [
-  { label: "Courses 📚", query: "Courses" },
-  { label: "Fees 💰", query: "Fees" },
-  { label: "Admissions 🎓", query: "Admissions" },
-  { label: "Contact 📞", query: "Contact" },
+  { label: "Courses", query: "What courses does SNGCE offer?" },
+  { label: "Fees", query: "What is the fee structure at SNGCE?" },
+  { label: "Admissions", query: "How to get admission in SNGCE?" },
+  { label: "Placements", query: "What are placement opportunities at SNGCE?" },
 ];
 
 const navCards = [
   {
-    to: "#chatbot",
+    to: "chatbot",
     icon: MessageCircle,
     label: "AI Assistant",
     desc: "Get instant answers",
@@ -73,39 +73,33 @@ const navCards = [
 ];
 
 function openChatbotWithMessage(message: string) {
-  // Step 1: Open the chatbot widget
   const openBtn = document.querySelector<HTMLButtonElement>(
     '[data-ocid="chatbot.open_modal_button"]',
   );
   if (openBtn) {
     openBtn.click();
   }
-
-  // Step 2: After a short delay, inject the message and submit
   setTimeout(() => {
     const chatInput = document.querySelector<HTMLInputElement>(
       '[data-ocid="chatbot.input"]',
     );
     if (chatInput) {
-      // Use React's native input value setter so React state updates properly
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      const setter = Object.getOwnPropertyDescriptor(
         window.HTMLInputElement.prototype,
         "value",
       )?.set;
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(chatInput, message);
+      if (setter) {
+        setter.call(chatInput, message);
         chatInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
-
-      // Small additional delay for React to sync state before clicking submit
       setTimeout(() => {
-        const submitBtn = document.querySelector<HTMLButtonElement>(
+        const btn = document.querySelector<HTMLButtonElement>(
           '[data-ocid="chatbot.submit_button"]',
         );
-        submitBtn?.click();
+        btn?.click();
       }, 80);
     }
-  }, 120);
+  }, 200);
 }
 
 export function HomePage() {
@@ -121,34 +115,29 @@ export function HomePage() {
     openChatbotWithMessage(text);
   };
 
-  const handleHeroChip = (query: string) => {
-    openChatbotWithMessage(query);
-  };
-
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      {/* Background image */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
-          alt="College campus"
+          src="/assets/uploads/college1-2-1.jpg"
+          alt="SNGCE College campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(40%) brightness(0.35)"
-              : "grayscale(20%) brightness(0.75)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark
+              ? "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.40) 100%)"
+              : "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.30) 100%)",
+          }}
         />
       </div>
 
-      {/* Hero */}
       <section className="relative pt-28 pb-10 px-4 sm:px-6 text-center">
         <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 glass-sm px-4 py-1.5 rounded-full text-xs font-medium text-muted-foreground mb-6">
@@ -161,7 +150,7 @@ export function HomePage() {
           >
             Sree Narayana Gurukulam
             <br />
-            <span className="text-foreground/70">College of Engineering</span>
+            <span className="text-foreground/80">College of Engineering</span>
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
             Empowering future engineers with excellence in education,
@@ -188,98 +177,69 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── AI Chatbot Hero ── */}
       <section className="px-4 sm:px-6 pb-10">
         <div className="max-w-5xl mx-auto">
-          {/* Outer glow wrapper */}
-          <div
-            className="rounded-2xl p-[1px]"
-            style={{
-              background: isDark
-                ? "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.14) 100%)"
-                : "linear-gradient(135deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.80) 100%)",
-              boxShadow: isDark
-                ? "0 0 48px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.45)"
-                : "0 0 48px rgba(255,255,255,0.55), 0 12px 40px rgba(0,0,0,0.10)",
-            }}
-          >
-            <div
-              className="glass rounded-2xl px-6 sm:px-10 py-8 sm:py-10 flex flex-col gap-6"
-              style={{ borderRadius: "15px" }}
-            >
-              {/* Header row */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div
-                  className="glass-sm w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse-glow"
-                  style={{
-                    background: isDark
-                      ? "rgba(255,255,255,0.12)"
-                      : "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  <Bot size={24} className="text-foreground" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-display font-bold text-foreground text-xl sm:text-2xl leading-tight">
-                      SNGCE AI Assistant
-                    </h2>
-                    <span className="inline-flex items-center gap-1 glass-sm px-2 py-0.5 rounded-full text-[10px] font-medium text-muted-foreground">
-                      <Sparkles size={10} />
-                      Gemini AI
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground text-sm mt-0.5">
-                    Ask me anything — courses, fees, admissions, faculty, or
-                    navigate the portal
-                  </p>
-                </div>
+          <div className="glass rounded-2xl px-6 sm:px-10 py-8 sm:py-10 flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="glass-sm w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 animate-pulse-glow">
+                <Bot size={24} className="text-foreground" />
               </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display font-bold text-foreground text-xl sm:text-2xl leading-tight">
+                    SNGCE AI Assistant
+                  </h2>
+                  <span className="inline-flex items-center gap-1 glass-sm px-2 py-0.5 rounded-full text-[10px] font-medium text-muted-foreground">
+                    <Sparkles size={10} />
+                    Gemini AI
+                  </span>
+                </div>
+                <p className="text-muted-foreground text-sm mt-0.5">
+                  Ask me anything — courses, fees, admissions, faculty, or
+                  navigate the portal
+                </p>
+              </div>
+            </div>
 
-              {/* Input row */}
-              <div className="flex gap-2 sm:gap-3">
-                <input
-                  ref={heroInputRef}
-                  type="text"
-                  value={heroInput}
-                  onChange={(e) => setHeroInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleHeroSubmit()}
-                  placeholder="e.g. What B.Tech courses does SNGCE offer?"
-                  data-ocid="home.chatbot_hero.input"
-                  className="flex-1 glass-sm px-4 py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-none"
-                />
+            <div className="flex gap-2 sm:gap-3">
+              <input
+                ref={heroInputRef}
+                type="text"
+                value={heroInput}
+                onChange={(e) => setHeroInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleHeroSubmit()}
+                placeholder="e.g. What B.Tech courses does SNGCE offer?"
+                data-ocid="home.chatbot_hero.input"
+                className="flex-1 glass-sm px-4 py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-none"
+              />
+              <button
+                type="button"
+                onClick={handleHeroSubmit}
+                disabled={!heroInput.trim()}
+                data-ocid="home.chatbot_hero.submit_button"
+                className="glass-btn px-4 sm:px-5 py-3 flex items-center gap-2 text-foreground font-medium disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                <Send size={16} />
+                <span className="hidden sm:inline">Ask now</span>
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {QUICK_CHIPS.map((chip) => (
                 <button
+                  key={chip.label}
                   type="button"
-                  onClick={handleHeroSubmit}
-                  disabled={!heroInput.trim()}
-                  data-ocid="home.chatbot_hero.submit_button"
-                  className="glass-btn px-4 sm:px-5 py-3 flex items-center gap-2 text-foreground font-medium disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
-                  aria-label="Ask the AI assistant"
+                  onClick={() => openChatbotWithMessage(chip.query)}
+                  className="glass-sm px-3.5 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-medium"
                 >
-                  <Send size={16} />
-                  <span className="hidden sm:inline">Ask now</span>
+                  {chip.label}
                 </button>
-              </div>
-
-              {/* Quick chips */}
-              <div className="flex flex-wrap gap-2">
-                {QUICK_CHIPS.map((chip) => (
-                  <button
-                    key={chip.label}
-                    type="button"
-                    onClick={() => handleHeroChip(chip.query)}
-                    className="glass-sm px-3.5 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-medium"
-                  >
-                    {chip.label}
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick Nav Cards */}
       <section className="px-4 sm:px-6 pb-16">
         <div className="max-w-5xl mx-auto">
           <h2 className="font-display font-semibold text-lg text-foreground/70 mb-6 text-center tracking-wide uppercase text-sm">
@@ -338,7 +298,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="px-4 sm:px-6 pb-16">
         <div className="max-w-5xl mx-auto">
           <div className="glass rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
@@ -361,7 +320,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/10 px-4 sm:px-6 py-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
@@ -373,7 +331,6 @@ export function HomePage() {
                 Sree Narayana Gurukulam College of Engineering, Kadayirippu,
                 Kolenchery, Ernakulam — established 2002. Approved by AICTE,
                 affiliated to APJ Abdul Kalam Technological University (KTU).
-                Managed by Sree Narayana Gurukulam Charitable Trust.
               </p>
             </div>
             <div>
@@ -398,8 +355,8 @@ export function HomePage() {
               </h3>
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
-                  <MapPin size={12} /> Kadayirippu P.O, Kolenchery, Ernakulam,
-                  Kerala 682311
+                  <MapPin size={12} /> Kadayirippu P.O, Kolenchery, Ernakulam
+                  682311
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
                   <Phone size={12} /> 0484-2597800 (30 Lines)
@@ -410,8 +367,10 @@ export function HomePage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-4 text-center text-muted-foreground text-xs">
-            © {new Date().getFullYear()}. Built with love by SNGCE
+          <div className="border-t border-white/10 pt-4 flex items-center justify-center">
+            <p className="text-muted-foreground text-xs">
+              © {new Date().getFullYear()}. Built with love by SNGCE
+            </p>
           </div>
         </div>
       </footer>

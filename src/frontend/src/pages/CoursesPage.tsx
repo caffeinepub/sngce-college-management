@@ -31,29 +31,26 @@ export function CoursesPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(50%) brightness(0.25)"
-              : "grayscale(20%) brightness(0.80)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.20)",
+          }}
         />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="glass-sm p-2 rounded-xl">
@@ -64,10 +61,9 @@ export function CoursesPage() {
             </h1>
           </div>
           <p className="text-muted-foreground text-sm">
-            SNGCE offers a range of undergraduate and postgraduate programs
-            approved by AICTE and affiliated to APJ Abdul Kalam Technological
-            University (KTU). Established in 2002, managed by Sree Narayana
-            Gurukulam Charitable Trust.
+            SNGCE offers undergraduate and postgraduate programs approved by
+            AICTE and affiliated to APJ Abdul Kalam Technological University
+            (KTU). Established 2002.
           </p>
         </div>
 
@@ -81,7 +77,6 @@ export function CoursesPage() {
               <div key={i} className="glass p-5 flex flex-col gap-3">
                 <Skeleton className="h-5 w-24 bg-foreground/10" />
                 <Skeleton className="h-4 w-32 bg-foreground/10" />
-                <Skeleton className="h-4 w-20 bg-foreground/10" />
               </div>
             ))}
           </div>
@@ -128,7 +123,9 @@ export function CoursesPage() {
                             {course.branch}
                           </h3>
                           <Badge
-                            className={`text-xs shrink-0 border-0 ${degreeColors[key] ?? ""}`}
+                            className={`text-xs shrink-0 border-0 ${
+                              degreeColors[key] ?? ""
+                            }`}
                           >
                             {degreeLabels[key] ?? key}
                           </Badge>

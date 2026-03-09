@@ -92,7 +92,6 @@ export function StaffDashboard() {
     }
   };
 
-  // Attendance helpers
   const addAttendance = () => {
     setLocalRecord((prev) => {
       if (!prev) return prev;
@@ -127,7 +126,6 @@ export function StaffDashboard() {
     });
   };
 
-  // Marks helpers
   const addMark = () => {
     setLocalRecord((prev) => {
       if (!prev) return prev;
@@ -162,7 +160,6 @@ export function StaffDashboard() {
     });
   };
 
-  // Fees helpers
   const addFee = () => {
     setLocalRecord((prev) => {
       if (!prev) return prev;
@@ -205,7 +202,6 @@ export function StaffDashboard() {
     });
   };
 
-  // Exam helpers
   const addExam = () => {
     setLocalRecord((prev) => {
       if (!prev) return prev;
@@ -251,7 +247,7 @@ export function StaffDashboard() {
       {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{

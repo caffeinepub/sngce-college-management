@@ -31,29 +31,26 @@ export function FeesPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1920&q=80"
-          alt="Campus building"
+          src="/assets/uploads/college1-2-1.jpg"
+          alt="Campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(50%) brightness(0.25)"
-              : "grayscale(20%) brightness(0.80)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.20)",
+          }}
         />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="glass-sm p-2 rounded-xl">
@@ -64,8 +61,8 @@ export function FeesPage() {
             </h1>
           </div>
           <p className="text-muted-foreground text-sm">
-            Detailed semester/year-wise fee breakdown for all programs. Fees are
-            subject to university revision.
+            Detailed year-wise fee breakdown for all programs. Fees are subject
+            to university revision.
           </p>
         </div>
 
@@ -146,7 +143,7 @@ export function FeesPage() {
                           {fs.yearSemesterBreakdown.map((row) => (
                             <tr
                               key={row.yearOrSemester}
-                              className="border-b border-white/5 last:border-0 hover:bg-foreground/5 transition-colors"
+                              className="border-b border-white/5 last:border-0 hover:bg-foreground/5"
                             >
                               <td className="px-4 py-3 text-foreground">
                                 {row.yearOrSemester}

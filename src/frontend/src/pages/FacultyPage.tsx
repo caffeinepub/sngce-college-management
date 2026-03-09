@@ -45,29 +45,26 @@ export function FacultyPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80"
-          alt="University hallway"
+          src="/assets/uploads/college1-2-1.jpg"
+          alt="Campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(50%) brightness(0.25)"
-              : "grayscale(20%) brightness(0.80)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.20)",
+          }}
         />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="glass-sm p-2 rounded-xl">
@@ -83,28 +80,27 @@ export function FacultyPage() {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {/* Search */}
           <div className="glass-sm flex items-center gap-2 px-3 py-2 rounded-xl flex-1">
             <Search size={15} className="text-muted-foreground shrink-0" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, subject…"
+              placeholder="Search by name, subject..."
               data-ocid="faculty.search_input"
               className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none w-full"
             />
           </div>
-          {/* Department */}
           <div className="flex gap-2 flex-wrap">
             {departments.slice(0, 5).map((dept) => (
               <button
                 type="button"
                 key={dept}
                 onClick={() => setSelectedDept(dept)}
-                data-ocid={`faculty.dept.${dept.toLowerCase().replace(/\s+/g, "_")}.button`}
+                data-ocid={`faculty.dept.${dept
+                  .toLowerCase()
+                  .replace(/\s+/g, "_")}.button`}
                 className={`glass-btn px-3 py-1.5 text-xs font-medium transition-all ${
                   selectedDept === dept
                     ? "bg-foreground/15 text-foreground"
@@ -143,7 +139,6 @@ export function FacultyPage() {
                 <div className="flex flex-col gap-2 flex-1">
                   <Skeleton className="h-5 w-32 bg-foreground/10" />
                   <Skeleton className="h-4 w-24 bg-foreground/10" />
-                  <Skeleton className="h-4 w-40 bg-foreground/10" />
                 </div>
               </div>
             ))}
@@ -164,11 +159,9 @@ export function FacultyPage() {
                 className="glass p-5 flex gap-4 hover:scale-[1.01] transition-transform"
                 data-ocid={`faculty.item.${i + 1}`}
               >
-                {/* Avatar */}
                 <div className="glass-sm w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-foreground font-display font-bold text-sm">
                   {getInitials(member.name)}
                 </div>
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-display font-semibold text-foreground text-sm">
                     {member.name}

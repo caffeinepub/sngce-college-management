@@ -1,54 +1,51 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Bot, MessageCircle, Navigation, Send, X } from "lucide-react";
+import { Bot, Globe, MessageCircle, Navigation, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { type ChatMessage, generateResponse } from "../utils/chatEngine";
-import { type GeminiMessage, callGemini } from "../utils/geminiApi";
+import {
+  type GeminiMessage,
+  type GeminiSource,
+  callGemini,
+} from "../utils/geminiApi";
 
 interface Message {
   id: string;
   role: "user" | "bot";
   text: string;
+  sources?: GeminiSource[];
   isMulti?: boolean;
-}
-
-/** Detect if a message contains multiple distinct questions */
-function detectMultipleQueries(text: string): boolean {
-  const questionMarks = (text.match(/\?/g) || []).length;
-  if (questionMarks >= 2) return true;
-  const numbered = /\b[1-9]\.\s/.test(text) && text.includes("?");
-  if (numbered) return true;
-  const keywords =
-    /\b(also|and also|what about|plus|additionally|another question|second question)\b/i.test(
-      text,
-    );
-  if (keywords && text.includes("?")) return true;
-  return false;
 }
 
 const WELCOME: Message = {
   id: "welcome",
   role: "bot",
-  text: "Hey! 👋 I'm SNGCE Assistant — your college guide powered by AI. Ask me anything about courses, fees, faculty, admissions, or anything else. I can also take you to any page in the portal!",
+  text: "Hi! I'm the SNGCE Assistant. I can answer anything about the college, courses, admissions, fees, placements, or any education question. What would you like to know?",
 };
 
-/** Render bot text: handle **bold** and newlines */
+function detectMultipleQueries(text: string): boolean {
+  const questionMarks = (text.match(/\?/g) || []).length;
+  if (questionMarks >= 2) return true;
+  return (
+    /\b(also|and also|what about|plus|another question)\b/i.test(text) &&
+    text.includes("?")
+  );
+}
+
 function BotText({ text }: { text: string }) {
-  const lines = text.split("\n");
   return (
     <span className="whitespace-pre-wrap">
-      {lines.map((line, li) => {
+      {text.split("\n").map((line, li) => {
         const parts = line.split(/\*\*(.+?)\*\*/g);
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: positional text lines
-          <span key={`line-${li}`}>
+          <span key={`l${li}`}>
             {li > 0 && <br />}
-            {parts.map((part, pi) =>
+            {parts.map((p, pi) =>
               pi % 2 === 1 ? (
                 // biome-ignore lint/suspicious/noArrayIndexKey: positional inline parts
-                <strong key={`b-${li}-${pi}`}>{part}</strong>
+                <strong key={`b${li}${pi}`}>{p}</strong>
               ) : (
                 // biome-ignore lint/suspicious/noArrayIndexKey: positional inline parts
-                <span key={`s-${li}-${pi}`}>{part}</span>
+                <span key={`s${li}${pi}`}>{p}</span>
               ),
             )}
           </span>
@@ -58,7 +55,7 @@ function BotText({ text }: { text: string }) {
   );
 }
 
-const CHIP_LABELS = ["Courses 📚", "Fees 💰", "Admissions 🎓", "Contact 📞"];
+const CHIPS = ["Courses offered", "Fee structure", "Admissions", "Placements"];
 
 export function ChatbotWidget() {
   const [open, setOpen] = useState(false);
@@ -66,25 +63,16 @@ export function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [geminiHistory, setGeminiHistory] = useState<GeminiMessage[]>([]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [history, setHistory] = useState<GeminiMessage[]>([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  // Build legacy history for fallback engine
-  const getLegacyHistory = (): ChatMessage[] => {
-    return messages.slice(1).map((m) => ({
-      role: m.role === "user" ? ("user" as const) : ("model" as const),
-      text: m.text,
-    }));
-  };
-
-  // Scroll to bottom whenever messages or pending state change
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scrollContainerRef is stable; messages/isPending are intentional triggers
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scrollRef is stable; messages/isPending are intentional triggers
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isPending]);
 
@@ -95,38 +83,31 @@ export function ChatbotWidget() {
     }
   }, [open]);
 
-  const dispatchMessage = async (text: string) => {
-    if (!text || isPending) return;
+  const send = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || isPending) return;
 
-    const isMulti = detectMultipleQueries(text);
+    setErrorMsg("");
+    const isMulti = detectMultipleQueries(trimmed);
     const userMsg: Message = {
-      id: `${Date.now()}`,
+      id: `u${Date.now()}`,
       role: "user",
-      text,
+      text: trimmed,
       isMulti,
     };
     setMessages((prev) => [...prev, userMsg]);
+    setInput("");
     setIsPending(true);
 
-    // Natural typing delay 400–700ms
-    const delay = 400 + Math.random() * 300;
-    await new Promise<void>((res) => setTimeout(res, delay));
-
-    let responseText = "";
-    let redirect: string | undefined;
+    const userPart: GeminiMessage = {
+      role: "user",
+      parts: [{ text: trimmed }],
+    };
+    const newHistory = [...history, userPart];
 
     try {
-      // Try Gemini API first
-      const newUserPart: GeminiMessage = {
-        role: "user",
-        parts: [{ text }],
-      };
-      const currentHistory = [...geminiHistory, newUserPart];
-      const result = await callGemini(text, geminiHistory);
-      responseText = result.text;
-      redirect = result.redirect;
+      const result = await callGemini(trimmed, history);
 
-      // Update Gemini history with both user message and model response
       const modelPart: GeminiMessage = {
         role: "model",
         parts: [
@@ -137,49 +118,50 @@ export function ChatbotWidget() {
           },
         ],
       };
-      setGeminiHistory([...currentHistory, modelPart]);
-    } catch (_err) {
-      // Fallback to local rule-based engine
-      const fallback = generateResponse(text, getLegacyHistory());
-      responseText = fallback.text;
-      redirect = fallback.redirect;
-    }
+      setHistory([...newHistory, modelPart]);
 
-    const botMsg: Message = {
-      id: `${Date.now()}_bot`,
-      role: "bot",
-      text: redirect
-        ? `${responseText} *(Navigating in a moment...)*`
-        : responseText,
-    };
-    setMessages((prev) => [...prev, botMsg]);
-    setIsPending(false);
+      const botMsg: Message = {
+        id: `b${Date.now()}`,
+        role: "bot",
+        text: result.redirect
+          ? `${result.text}\n\n*(Taking you there now...)*`
+          : result.text,
+        sources:
+          result.sources && result.sources.length > 0
+            ? result.sources
+            : undefined,
+      };
+      setMessages((prev) => [...prev, botMsg]);
 
-    if (redirect) {
-      const target = redirect;
-      setIsNavigating(true);
-      setTimeout(() => {
-        setIsNavigating(false);
-        navigate({ to: target });
-      }, 1500);
+      if (result.redirect) {
+        const target = result.redirect;
+        setIsNavigating(true);
+        setTimeout(() => {
+          setIsNavigating(false);
+          navigate({ to: target });
+        }, 1500);
+      }
+    } catch (err) {
+      const errText = err instanceof Error ? err.message : "Unknown error";
+      setErrorMsg(`Couldn't reach AI: ${errText}`);
+      const fallbackMsg: Message = {
+        id: `b${Date.now()}`,
+        role: "bot",
+        text: "I'm having trouble connecting right now. Please try again in a moment.",
+      };
+      setMessages((prev) => [...prev, fallbackMsg]);
+    } finally {
+      setIsPending(false);
     }
   };
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text || isPending) return;
-    setInput("");
-    dispatchMessage(text);
-  };
-
-  const handleChip = (chip: string) => {
-    const text = chip.split(" ")[0];
-    dispatchMessage(text);
+    if (text) send(text);
   };
 
   return (
     <>
-      {/* Floating button */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -191,34 +173,31 @@ export function ChatbotWidget() {
         {!open && <span className="text-sm font-medium pr-1">Ask SNGCE</span>}
       </button>
 
-      {/* Chat panel */}
       {open && (
         <div
           data-ocid="chatbot.modal"
           className="fixed bottom-20 right-6 z-50 w-80 sm:w-96 rounded-2xl overflow-hidden flex flex-col"
-          style={{ height: "480px" }}
+          style={{ height: "500px" }}
         >
           <div className="glass h-full flex flex-col rounded-2xl overflow-hidden">
-            {/* Header */}
             <div className="px-4 py-3 flex items-center gap-2 border-b border-white/10 flex-shrink-0">
               <div className="glass-sm p-1.5 rounded-lg">
                 <Bot size={16} className="text-foreground" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="font-display font-semibold text-sm text-foreground">
                   SNGCE Assistant
                 </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   {isNavigating ? (
                     <>
-                      <Navigation
-                        size={10}
-                        className="animate-pulse text-foreground/60"
-                      />
-                      <span>Navigating…</span>
+                      <Navigation size={10} className="animate-pulse" />{" "}
+                      <span>Navigating...</span>
                     </>
                   ) : (
-                    "AI-powered · Always here to help"
+                    <>
+                      <Globe size={10} /> <span>AI with live web search</span>
+                    </>
                   )}
                 </p>
               </div>
@@ -226,66 +205,80 @@ export function ChatbotWidget() {
                 type="button"
                 onClick={() => setOpen(false)}
                 data-ocid="chatbot.close_button"
-                className="ml-auto glass-btn p-1.5 text-muted-foreground hover:text-foreground"
-                aria-label="Close chat"
+                className="glass-btn p-1.5 text-muted-foreground hover:text-foreground ml-auto"
+                aria-label="Close"
               >
                 <X size={14} />
               </button>
             </div>
 
-            {/* Messages — native scroll for reliable scrollIntoView */}
             <div
-              ref={scrollContainerRef}
+              ref={scrollRef}
               className="flex-1 overflow-y-auto px-3 py-3 min-h-0"
               style={{ scrollBehavior: "smooth" }}
             >
               <div className="flex flex-col gap-3">
-                {messages.map((msg, msgIdx) => {
-                  // A user message with isMulti: show the badge while the very next message is pending
-                  const isLastUserMsg =
-                    msg.role === "user" &&
-                    msgIdx === messages.length - 1 &&
-                    isPending;
-                  const showMultiBadge = msg.isMulti && isLastUserMsg;
-
-                  return (
-                    <div key={msg.id} className="flex flex-col">
-                      <div
-                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        {msg.role === "bot" && (
-                          <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center mr-1.5 mt-0.5 flex-shrink-0">
-                            <Bot size={12} className="text-foreground/70" />
-                          </div>
-                        )}
-                        <div
-                          className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                            msg.role === "user"
-                              ? "bg-foreground text-background rounded-br-sm"
-                              : "glass-sm text-foreground rounded-bl-sm"
-                          }`}
-                        >
-                          {msg.role === "bot" ? (
-                            <BotText text={msg.text} />
-                          ) : (
-                            msg.text
-                          )}
-                        </div>
-                      </div>
-                      {showMultiBadge && (
-                        <div className="flex justify-end mt-1">
-                          <span className="glass-sm text-[10px] text-muted-foreground px-2 py-0.5 rounded-full flex items-center gap-1">
-                            📋 Organising multiple queries…
-                          </span>
+                {messages.map((msg) => (
+                  <div key={msg.id} className="flex flex-col">
+                    <div
+                      className={`flex ${
+                        msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {msg.role === "bot" && (
+                        <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center mr-1.5 mt-0.5 flex-shrink-0">
+                          <Bot size={12} className="text-foreground/70" />
                         </div>
                       )}
+                      <div
+                        className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                          msg.role === "user"
+                            ? "bg-foreground text-background rounded-br-sm"
+                            : "glass-sm text-foreground rounded-bl-sm"
+                        }`}
+                      >
+                        {msg.role === "bot" ? (
+                          <BotText text={msg.text} />
+                        ) : (
+                          msg.text
+                        )}
+                      </div>
                     </div>
-                  );
-                })}
+
+                    {msg.role === "bot" &&
+                      msg.sources &&
+                      msg.sources.length > 0 && (
+                        <div className="ml-7 mt-1 flex flex-col gap-0.5">
+                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide flex items-center gap-1">
+                            <Globe size={8} /> Sources
+                          </p>
+                          {msg.sources.map((src) => (
+                            <a
+                              key={src.url}
+                              href={src.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[11px] text-foreground/60 hover:text-foreground underline underline-offset-2 truncate max-w-[240px]"
+                            >
+                              {src.title || src.url}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+
+                    {msg.isMulti && msg.role === "user" && (
+                      <div className="flex justify-end mt-1">
+                        <span className="glass-sm text-[10px] text-muted-foreground px-2 py-0.5 rounded-full">
+                          Multiple questions detected
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
 
                 {isPending && (
-                  <div className="flex justify-start items-center gap-1.5">
-                    <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center flex-shrink-0">
+                  <div className="flex justify-start items-start gap-1.5">
+                    <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Bot size={12} className="text-foreground/70" />
                     </div>
                     <div className="glass-sm rounded-2xl rounded-bl-sm px-3 py-2.5">
@@ -297,21 +290,32 @@ export function ChatbotWidget() {
                         <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
                         <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
                       </span>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                        <Globe size={8} className="animate-pulse" />{" "}
+                        Searching...
+                      </p>
                     </div>
                   </div>
                 )}
-                <div />
+
+                {errorMsg && (
+                  <p
+                    className="text-xs text-destructive text-center px-2"
+                    data-ocid="chatbot.error_state"
+                  >
+                    {errorMsg}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Quick suggestion chips — shown only on fresh chat */}
             {messages.length <= 1 && !isPending && (
               <div className="px-3 pb-2 flex gap-1.5 flex-wrap flex-shrink-0">
-                {CHIP_LABELS.map((chip) => (
+                {CHIPS.map((chip) => (
                   <button
                     key={chip}
                     type="button"
-                    onClick={() => handleChip(chip)}
+                    onClick={() => send(chip)}
                     className="glass-sm text-xs px-2.5 py-1 rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {chip}
@@ -320,15 +324,16 @@ export function ChatbotWidget() {
               </div>
             )}
 
-            {/* Input */}
             <div className="px-3 pb-3 pt-2 border-t border-white/10 flex gap-2 flex-shrink-0">
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Ask anything about SNGCE…"
+                onKeyDown={(e) =>
+                  e.key === "Enter" && !e.shiftKey && handleSend()
+                }
+                placeholder="Ask anything about SNGCE..."
                 data-ocid="chatbot.input"
                 className="flex-1 glass-sm px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-none"
                 disabled={isPending}
@@ -339,7 +344,7 @@ export function ChatbotWidget() {
                 disabled={!input.trim() || isPending}
                 data-ocid="chatbot.submit_button"
                 className="glass-btn px-3 py-2 text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="Send message"
+                aria-label="Send"
               >
                 <Send size={16} />
               </button>

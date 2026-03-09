@@ -2,8 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AcademicRecord, UserProfile } from "../backend.d";
 import { useActor } from "./useActor";
 
-// ── Public queries ─────────────────────────────────────
-
 export function useAllCourses() {
   const { actor, isFetching } = useActor();
   return useQuery({
@@ -42,8 +40,6 @@ export function useFacultyDirectory() {
     staleTime: 5 * 60 * 1000,
   });
 }
-
-// ── Student queries ────────────────────────────────────
 
 export function useAttendanceByStudent(studentId: string | null) {
   const { actor, isFetching } = useActor();
@@ -105,8 +101,6 @@ export function useStudentRecord(studentId: string | null) {
   });
 }
 
-// ── Mutations ──────────────────────────────────────────
-
 export function useSaveAcademicRecord() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -144,8 +138,6 @@ export function useSaveUserProfile() {
     },
   });
 }
-
-// ── Chatbot ────────────────────────────────────────────
 
 export function useChatbotResponse() {
   const { actor } = useActor();

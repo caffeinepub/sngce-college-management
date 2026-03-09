@@ -104,7 +104,7 @@ export function ClassifiedPage() {
       {/* Background */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{

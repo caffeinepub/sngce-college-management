@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 
-// Helper to read tab from URL
 function getTabFromSearch(): "student" | "staff" | "admin" {
   const params = new URLSearchParams(window.location.search);
   const tab = params.get("tab");
@@ -22,7 +21,6 @@ function getTabFromSearch(): "student" | "staff" | "admin" {
   return "student";
 }
 
-// Demo credentials
 const DEMO_STUDENTS: Record<
   string,
   { password: string; name: string; dept: string }
@@ -68,7 +66,6 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect if already logged in
   useEffect(() => {
     if (isLoggedIn) {
       if (role === "student") navigate({ to: "/student-dashboard" });
@@ -81,7 +78,6 @@ export function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     await new Promise((r) => setTimeout(r, 700));
 
     if (activeTab === "student") {
@@ -115,37 +111,32 @@ export function LoginPage() {
       toast.success(`Welcome, ${staff.name}!`);
       navigate({ to: "/staff-dashboard" });
     }
-
     setLoading(false);
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
-      {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(60%) brightness(0.20)"
-              : "grayscale(20%) brightness(0.75)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.20)",
+          }}
         />
       </div>
 
       <div className="w-full max-w-md px-4 py-10">
-        {/* Card */}
         <div className="glass rounded-2xl p-8">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="glass-sm w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
               {activeTab === "student" ? (
@@ -164,65 +155,36 @@ export function LoginPage() {
             </p>
           </div>
 
-          {/* Tab switcher */}
           <div className="glass-sm flex rounded-xl p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("student");
-                setError("");
-                setId("");
-                setPassword("");
-              }}
-              data-ocid="login.student.tab"
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === "student"
-                  ? "bg-foreground/10 text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <GraduationCap size={15} />
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("staff");
-                setError("");
-                setId("");
-                setPassword("");
-              }}
-              data-ocid="login.staff.tab"
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === "staff"
-                  ? "bg-foreground/10 text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <ShieldCheck size={15} />
-              Staff
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("admin");
-                setError("");
-                setId("");
-                setPassword("");
-              }}
-              data-ocid="login.admin.tab"
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === "admin"
-                  ? "bg-foreground/10 text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <ShieldAlert size={15} />
-              Admin
-            </button>
+            {(["student", "staff", "admin"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => {
+                  setActiveTab(tab);
+                  setError("");
+                  setId("");
+                  setPassword("");
+                }}
+                data-ocid={`login.${tab}.tab`}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === tab
+                    ? "bg-foreground/10 text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab === "student" ? (
+                  <GraduationCap size={15} />
+                ) : tab === "admin" ? (
+                  <ShieldAlert size={15} />
+                ) : (
+                  <ShieldCheck size={15} />
+                )}
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
               <label
@@ -250,7 +212,7 @@ export function LoginPage() {
                 data-ocid="login.id.input"
                 required
                 autoComplete="username"
-                className="glass-sm w-full px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-0 ring-0 focus:ring-1 focus:ring-foreground/20"
+                className="glass-sm w-full px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-0"
               />
             </div>
             <div>
@@ -284,7 +246,6 @@ export function LoginPage() {
               </div>
             </div>
 
-            {/* Error */}
             {error && (
               <p
                 className="text-xs text-destructive text-center"
@@ -294,7 +255,6 @@ export function LoginPage() {
               </p>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading || !id || !password}
@@ -307,18 +267,16 @@ export function LoginPage() {
                   data-ocid="login.loading_state"
                 >
                   <span className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
-                  Signing in…
+                  Signing in...
                 </span>
               ) : (
                 <>
-                  <LogIn size={16} />
-                  Sign In
+                  <LogIn size={16} /> Sign In
                 </>
               )}
             </button>
           </form>
 
-          {/* Demo credentials */}
           <div className="mt-5 glass-sm rounded-xl p-4">
             <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-2.5">
               <Info size={13} />

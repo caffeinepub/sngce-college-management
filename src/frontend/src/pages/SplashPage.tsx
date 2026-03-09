@@ -19,41 +19,26 @@ export function SplashPage() {
           "linear-gradient(135deg, #0a0a0a 0%, #111111 40%, #0d0d0d 100%)",
       }}
     >
-      {/* Background college image */}
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "grayscale(60%) blur(2px)",
-        }}
-      />
-
-      {/* Radial glow */}
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)",
+          backgroundImage: "url('/assets/uploads/college1-2-1.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "brightness(0.45) saturate(0.7)",
         }}
       />
-
-      {/* Content */}
+      <div
+        className="absolute inset-0"
+        style={{ background: "rgba(0,0,0,0.40)" }}
+      />
       <div className="relative z-10 flex flex-col items-center gap-4 text-center px-8">
-        {/* Welcome to */}
         <p
           className="text-white/60 text-lg font-sans tracking-widest uppercase"
-          style={{
-            opacity: 0,
-            animation: "fadeInUp 0.8s ease 0.4s forwards",
-          }}
+          style={{ opacity: 0, animation: "fadeInUp 0.8s ease 0.4s forwards" }}
         >
           Welcome to
         </p>
-
-        {/* SNGCE */}
         <h1
           className="font-display font-bold text-white"
           style={{
@@ -65,8 +50,6 @@ export function SplashPage() {
         >
           SNGCE
         </h1>
-
-        {/* Full name */}
         <p
           className="text-white/50 text-sm sm:text-base font-sans max-w-md leading-relaxed"
           style={{
@@ -80,8 +63,6 @@ export function SplashPage() {
             Kadayirippu, Ernakulam, Kerala
           </span>
         </p>
-
-        {/* Progress bar */}
         <div className="mt-8 w-40 h-0.5 bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full bg-white/40 rounded-full"
@@ -92,17 +73,6 @@ export function SplashPage() {
           />
         </div>
       </div>
-
-      {/* Subtle grain overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-30"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-          backgroundRepeat: "repeat",
-          backgroundSize: "150px",
-        }}
-      />
     </div>
   );
 }

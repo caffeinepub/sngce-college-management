@@ -42,13 +42,10 @@ export function StudentDashboard() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
-  const department = "Computer Science"; // Default department for timetable
+  const department = "Computer Science";
 
   useEffect(() => {
-    if (!isLoggedIn || role !== "student") {
-      navigate({ to: "/login" });
-    }
+    if (!isLoggedIn || role !== "student") navigate({ to: "/login" });
   }, [isLoggedIn, role, navigate]);
 
   const { data: attendance, isLoading: loadingAttendance } =
@@ -74,29 +71,26 @@ export function StudentDashboard() {
 
   return (
     <div className="relative min-h-screen">
-      {/* BG */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80"
+          src="/assets/uploads/college1-2-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{
             filter: isDark
-              ? "grayscale(60%) brightness(0.20)"
-              : "grayscale(20%) brightness(0.75)",
+              ? "brightness(0.55) saturate(0.8)"
+              : "brightness(0.70) saturate(0.9)",
           }}
         />
         <div
-          className={
-            isDark
-              ? "bg-overlay absolute inset-0"
-              : "bg-overlay-light absolute inset-0"
-          }
+          className="absolute inset-0"
+          style={{
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.20)",
+          }}
         />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        {/* Profile header */}
         <div className="glass rounded-2xl p-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="glass-sm w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-display font-bold text-xl text-foreground">
@@ -127,7 +121,6 @@ export function StudentDashboard() {
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs defaultValue="attendance">
           <TabsList className="glass mb-6 p-1 h-auto flex gap-1 bg-transparent w-full">
             {[
@@ -148,14 +141,13 @@ export function StudentDashboard() {
             ))}
           </TabsList>
 
-          {/* Attendance */}
           <TabsContent value="attendance">
             {loadingAttendance ? (
               <div
                 className="flex flex-col gap-3"
                 data-ocid="student.attendance.loading_state"
               >
-                {(["s1", "s2", "s3", "s4", "s5"] as const).map((k) => (
+                {[1, 2, 3, 4, 5].map((k) => (
                   <div key={k} className="glass p-4 flex gap-3 items-center">
                     <Skeleton className="h-4 w-32 bg-foreground/10" />
                     <Skeleton className="h-3 flex-1 bg-foreground/10" />
@@ -216,7 +208,6 @@ export function StudentDashboard() {
             )}
           </TabsContent>
 
-          {/* Marks */}
           <TabsContent value="marks">
             {loadingMarks ? (
               <div
@@ -224,7 +215,7 @@ export function StudentDashboard() {
                 data-ocid="student.marks.loading_state"
               >
                 <Skeleton className="h-6 w-full mb-3 bg-foreground/10" />
-                {(["a", "b", "c", "d"] as const).map((k) => (
+                {[1, 2, 3, 4].map((k) => (
                   <Skeleton
                     key={k}
                     className="h-10 w-full mb-2 bg-foreground/10"
@@ -262,7 +253,7 @@ export function StudentDashboard() {
                     {marks.map((m: Marks, i: number) => (
                       <tr
                         key={`${m.subjectId}-${m.examType}-${i}`}
-                        className="border-b border-white/5 last:border-0 hover:bg-foreground/5 transition-colors"
+                        className="border-b border-white/5 last:border-0 hover:bg-foreground/5"
                         data-ocid={`student.marks.item.${i + 1}`}
                       >
                         <td className="px-5 py-3 text-foreground">
@@ -282,14 +273,13 @@ export function StudentDashboard() {
             )}
           </TabsContent>
 
-          {/* Exam Timetable */}
           <TabsContent value="exams">
             {loadingExams ? (
               <div
                 className="flex flex-col gap-3"
                 data-ocid="student.exams.loading_state"
               >
-                {(["e1", "e2", "e3", "e4"] as const).map((k) => (
+                {[1, 2, 3, 4].map((k) => (
                   <div key={k} className="glass p-4">
                     <Skeleton className="h-5 w-40 mb-2 bg-foreground/10" />
                     <Skeleton className="h-4 w-24 bg-foreground/10" />
@@ -342,14 +332,13 @@ export function StudentDashboard() {
             )}
           </TabsContent>
 
-          {/* Fees Due */}
           <TabsContent value="fees">
             {loadingFees ? (
               <div
                 className="flex flex-col gap-3"
                 data-ocid="student.fees.loading_state"
               >
-                {(["f1", "f2", "f3"] as const).map((k) => (
+                {[1, 2, 3].map((k) => (
                   <div key={k} className="glass p-4">
                     <Skeleton className="h-5 w-40 mb-2 bg-foreground/10" />
                     <Skeleton className="h-4 w-24 bg-foreground/10" />
@@ -371,7 +360,6 @@ export function StudentDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {/* Summary */}
                 <div className="glass rounded-2xl p-4 flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-xs">
@@ -383,7 +371,6 @@ export function StudentDashboard() {
                   </div>
                   <AlertTriangle size={20} className="text-amber-400" />
                 </div>
-
                 {feesDue.map((fee: FeesDue, i: number) => (
                   <div
                     key={`${fee.yearSemester}-${i}`}

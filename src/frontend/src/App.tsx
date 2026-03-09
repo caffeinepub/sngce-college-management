@@ -21,7 +21,6 @@ import { SplashPage } from "./pages/SplashPage";
 import { StaffDashboard } from "./pages/StaffDashboard";
 import { StudentDashboard } from "./pages/StudentDashboard";
 
-// Root route
 const rootRoute = createRootRoute({
   component: () => (
     <AuthProvider>
@@ -33,84 +32,72 @@ const rootRoute = createRootRoute({
   ),
 });
 
-// Splash
 const splashRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: SplashPage,
 });
 
-// Layout route (wraps pages with navbar + chatbot)
 const layoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "layout",
   component: Layout,
 });
 
-// Home
 const homeRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/home",
   component: HomePage,
 });
 
-// Courses
 const coursesRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/courses",
   component: CoursesPage,
 });
 
-// Fees
 const feesRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/fees",
   component: FeesPage,
 });
 
-// Faculty
 const facultyRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/faculty",
   component: FacultyPage,
 });
 
-// Login
 const loginRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/login",
   component: LoginPage,
 });
 
-// Student dashboard
 const studentDashboardRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/student-dashboard",
   component: StudentDashboard,
 });
 
-// Staff dashboard
 const staffDashboardRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/staff-dashboard",
   component: StaffDashboard,
 });
 
-// Admin dashboard
 const adminDashboardRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/admin-dashboard",
   component: AdminDashboard,
 });
 
-// Classified page
 const classifiedRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/classified",
   component: ClassifiedPage,
 });
 
-// Build route tree
 const routeTree = rootRoute.addChildren([
   splashRoute,
   layoutRoute.addChildren([
