@@ -118,7 +118,7 @@ export function LoginPage() {
     <div className="relative min-h-screen flex items-center justify-center">
       <div className="fixed inset-0 -z-10">
         <img
-          src="/assets/uploads/college1-2-1.jpg"
+          src="/assets/uploads/college1-3-1.jpg"
           alt="Campus"
           className="w-full h-full object-cover"
           style={{

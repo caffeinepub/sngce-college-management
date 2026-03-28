@@ -119,7 +119,7 @@ export function HomePage() {
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="fixed inset-0 -z-10">
         <img
-          src="/assets/uploads/college1-2-1.jpg"
+          src="/assets/uploads/college1-3-1.jpg"
           alt="SNGCE College campus"
           className="w-full h-full object-cover"
           style={{

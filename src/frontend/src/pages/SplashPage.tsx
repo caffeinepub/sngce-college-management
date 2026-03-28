@@ -22,7 +22,7 @@ export function SplashPage() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "url('/assets/uploads/college1-2-1.jpg')",
+          backgroundImage: "url('/assets/uploads/college1-3-1.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "brightness(0.45) saturate(0.7)",
