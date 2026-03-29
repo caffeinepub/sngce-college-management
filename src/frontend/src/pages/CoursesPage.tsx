@@ -10,24 +10,59 @@ const degreeLabels: Record<string, string> = {
   bTech: "B.Tech",
   mTech: "M.Tech",
   mba: "MBA",
+  mca: "MCA",
 };
 
 const degreeColors: Record<string, string> = {
   bTech: "bg-blue-500/15 text-blue-400",
   mTech: "bg-purple-500/15 text-purple-400",
   mba: "bg-amber-500/15 text-amber-400",
+  mca: "bg-emerald-500/15 text-emerald-400",
 };
 
+interface LocalCourse {
+  branch: string;
+  degree: string;
+  durationYears: number;
+  intake?: number;
+}
+
+function loadLocalCourses(): LocalCourse[] | null {
+  try {
+    const raw = localStorage.getItem("sngce_courses");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function CoursesPage() {
-  const { data: courses, isLoading } = useAllCourses();
+  const { data: backendCourses, isLoading } = useAllCourses();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const grouped = {
-    bTech: courses?.filter((c) => c.degree === Degree.bTech) ?? [],
-    mTech: courses?.filter((c) => c.degree === Degree.mTech) ?? [],
-    mba: courses?.filter((c) => c.degree === Degree.mba) ?? [],
-  };
+  const localCourses = loadLocalCourses();
+
+  const courses = localCourses ?? backendCourses ?? [];
+
+  const allDegrees = Array.from(
+    new Set(courses.map((c) => c.degree as string)),
+  );
+  const degreeKeys = ["bTech", "mTech", "mba", "mca"].filter(
+    (d) =>
+      allDegrees.includes(d) ||
+      allDegrees.includes(Degree[d as keyof typeof Degree]),
+  );
+
+  const grouped: Record<string, LocalCourse[]> = {};
+  for (const key of degreeKeys) {
+    grouped[key] = courses.filter(
+      (c) =>
+        c.degree === key || c.degree === Degree[key as keyof typeof Degree],
+    );
+  }
+
+  const tabs = degreeKeys.filter((k) => (grouped[k]?.length ?? 0) > 0);
 
   return (
     <div className="relative min-h-screen">
@@ -67,7 +102,7 @@ export function CoursesPage() {
           </p>
         </div>
 
-        {isLoading ? (
+        {isLoading && !localCourses ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             data-ocid="courses.loading_state"
@@ -81,23 +116,23 @@ export function CoursesPage() {
             ))}
           </div>
         ) : (
-          <Tabs defaultValue="bTech" data-ocid="courses.tab">
+          <Tabs defaultValue={tabs[0] ?? "bTech"} data-ocid="courses.tab">
             <TabsList className="glass mb-6 p-1 h-auto flex gap-1 bg-transparent">
-              {Object.entries(degreeLabels).map(([key, label]) => (
+              {tabs.map((key) => (
                 <TabsTrigger
                   key={key}
                   value={key}
                   data-ocid={`courses.${key}.tab`}
                   className="glass-btn px-4 py-2 text-sm data-[state=active]:bg-foreground/10 data-[state=active]:text-foreground rounded-xl"
                 >
-                  {label} ({grouped[key as keyof typeof grouped].length})
+                  {degreeLabels[key] ?? key} ({grouped[key]?.length ?? 0})
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {Object.entries(grouped).map(([key, list]) => (
+            {tabs.map((key) => (
               <TabsContent key={key} value={key}>
-                {list.length === 0 ? (
+                {(grouped[key]?.length ?? 0) === 0 ? (
                   <div
                     className="glass rounded-2xl p-12 text-center"
                     data-ocid="courses.empty_state"
@@ -112,7 +147,7 @@ export function CoursesPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {list.map((course, i) => (
+                    {(grouped[key] ?? []).map((course, i) => (
                       <div
                         key={`${course.branch}-${i}`}
                         className="glass p-5 flex flex-col gap-4 hover:scale-[1.01] transition-transform"
@@ -123,9 +158,7 @@ export function CoursesPage() {
                             {course.branch}
                           </h3>
                           <Badge
-                            className={`text-xs shrink-0 border-0 ${
-                              degreeColors[key] ?? ""
-                            }`}
+                            className={`text-xs shrink-0 border-0 ${degreeColors[key] ?? ""}`}
                           >
                             {degreeLabels[key] ?? key}
                           </Badge>
@@ -135,10 +168,12 @@ export function CoursesPage() {
                           {course.durationYears} Year
                           {course.durationYears > 1 ? "s" : ""} Program
                         </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
-                          <GraduationCap size={13} />
-                          Affiliated to APJ KTU
-                        </div>
+                        {(course as LocalCourse).intake && (
+                          <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                            <GraduationCap size={13} />
+                            Intake: {(course as LocalCourse).intake} seats
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

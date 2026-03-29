@@ -14,7 +14,22 @@ const degreeLabels: Record<string, string> = {
   bTech: "B.Tech",
   mTech: "M.Tech",
   mba: "MBA",
+  mca: "MCA",
 };
+
+interface LocalFeeStructure {
+  course: { branch: string; degree: string; durationYears: number };
+  yearSemesterBreakdown: { yearOrSemester: string; amount: number }[];
+}
+
+function loadLocalFees(): LocalFeeStructure[] | null {
+  try {
+    const raw = localStorage.getItem("sngce_fees");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 function formatAmount(amount: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -25,9 +40,25 @@ function formatAmount(amount: number) {
 }
 
 export function FeesPage() {
-  const { data: feeStructures, isLoading } = useAllFeeStructures();
+  const { data: backendFees, isLoading } = useAllFeeStructures();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+
+  const localFees = loadLocalFees();
+
+  const feeStructures: LocalFeeStructure[] =
+    localFees ??
+    (backendFees ?? []).map((fs) => ({
+      course: {
+        branch: fs.course.branch,
+        degree: fs.course.degree as string,
+        durationYears: fs.course.durationYears,
+      },
+      yearSemesterBreakdown: fs.yearSemesterBreakdown.map((r) => ({
+        yearOrSemester: r.yearOrSemester,
+        amount: r.amount,
+      })),
+    }));
 
   return (
     <div className="relative min-h-screen">
@@ -66,7 +97,7 @@ export function FeesPage() {
           </p>
         </div>
 
-        {isLoading ? (
+        {isLoading && !localFees ? (
           <div className="flex flex-col gap-3" data-ocid="fees.loading_state">
             {Array.from({ length: 4 }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: skeleton loader
@@ -76,7 +107,7 @@ export function FeesPage() {
               </div>
             ))}
           </div>
-        ) : !feeStructures?.length ? (
+        ) : !feeStructures.length ? (
           <div
             className="glass rounded-2xl p-12 text-center"
             data-ocid="fees.empty_state"
@@ -96,6 +127,17 @@ export function FeesPage() {
                 (acc, row) => acc + row.amount,
                 0,
               );
+              const degreeKey =
+                fs.course.degree === Degree.bTech ||
+                fs.course.degree === "bTech"
+                  ? "bTech"
+                  : fs.course.degree === Degree.mTech ||
+                      fs.course.degree === "mTech"
+                    ? "mTech"
+                    : fs.course.degree === Degree.mba ||
+                        fs.course.degree === "mba"
+                      ? "mba"
+                      : (fs.course.degree as string);
               const key = `${fs.course.branch}-${fs.course.degree}`;
               return (
                 <AccordionItem
@@ -111,7 +153,7 @@ export function FeesPage() {
                           {fs.course.branch}
                         </p>
                         <p className="text-muted-foreground text-xs mt-0.5">
-                          {degreeLabels[fs.course.degree] ?? fs.course.degree} ·{" "}
+                          {degreeLabels[degreeKey] ?? degreeKey} ·{" "}
                           {fs.course.durationYears} Years
                         </p>
                       </div>

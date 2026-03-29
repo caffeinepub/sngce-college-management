@@ -78,6 +78,27 @@ export interface Student {
     lastName: string;
     firstName: string;
 }
+export interface AdminCourse {
+    branch: string;
+    degree: string;
+    durationYears: bigint;
+    intake: bigint;
+}
+export interface AdminFeeBreakdown {
+    yearOrSemester: string;
+    amount: number;
+}
+export interface AdminFeeEntry {
+    courseBranch: string;
+    yearSemesterBreakdown: Array<AdminFeeBreakdown>;
+}
+export interface AdminFacultyMember {
+    name: string;
+    qualification: string;
+    designation: string;
+    subjectsTaught: Array<string>;
+    department: string;
+}
 export enum Degree {
     mba = "mba",
     bTech = "bTech",
@@ -89,8 +110,13 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
+    addAdminCourse(course: AdminCourse): Promise<void>;
+    addAdminFaculty(member: AdminFacultyMember): Promise<void>;
     addOrUpdateAcademicRecord(studentId: string, record: AcademicRecord): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    getAdminCourses(): Promise<Array<AdminCourse>>;
+    getAdminFacultyList(): Promise<Array<AdminFacultyMember>>;
+    getAdminFeeEntries(): Promise<Array<AdminFeeEntry>>;
     getAllAcademicRecords(): Promise<Array<AcademicRecord>>;
     getAllCourses(): Promise<Array<Course>>;
     getAllFeeStructures(): Promise<Array<FeeStructure>>;
@@ -115,5 +141,8 @@ export interface backendInterface {
     getSubjectsByDepartment(department: string): Promise<Array<Subject>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    removeAdminCourse(branch: string): Promise<void>;
+    removeAdminFaculty(name: string, department: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    upsertAdminFeeEntry(entry: AdminFeeEntry): Promise<void>;
 }

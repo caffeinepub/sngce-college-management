@@ -5,35 +5,66 @@ import type { FacultyMember } from "../backend.d";
 import { useTheme } from "../contexts/ThemeContext";
 import { useFacultyDirectory } from "../hooks/useQueries";
 
+interface LocalFaculty {
+  name: string;
+  qualification: string;
+  designation: string;
+  department: string;
+  subjectsTaught: string[];
+}
+
+function loadLocalFaculty(): LocalFaculty[] | null {
+  try {
+    const raw = localStorage.getItem("sngce_faculty");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function toDisplayFaculty(f: LocalFaculty | FacultyMember): LocalFaculty {
+  return {
+    name: f.name,
+    qualification: f.qualification,
+    designation: (f as LocalFaculty).designation ?? "",
+    department: f.department,
+    subjectsTaught: f.subjectsTaught ?? [],
+  };
+}
+
 export function FacultyPage() {
-  const { data: faculty, isLoading } = useFacultyDirectory();
+  const { data: backendFaculty, isLoading } = useFacultyDirectory();
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [selectedDept, setSelectedDept] = useState<string>("All");
   const [search, setSearch] = useState("");
 
+  const localFaculty = loadLocalFaculty();
+  const rawFaculty: LocalFaculty[] = useMemo(() => {
+    const lf = loadLocalFaculty();
+    return lf ?? (backendFaculty ?? []).map(toDisplayFaculty);
+  }, [backendFaculty]);
+
   const departments = useMemo(() => {
-    const depts = Array.from(
-      new Set(faculty?.map((f: FacultyMember) => f.department) ?? []),
-    );
+    const depts = Array.from(new Set(rawFaculty.map((f) => f.department)));
     return ["All", ...depts.sort()];
-  }, [faculty]);
+  }, [rawFaculty]);
 
   const filtered = useMemo(() => {
-    let list = faculty ?? [];
+    let list = rawFaculty;
     if (selectedDept !== "All")
-      list = list.filter((f: FacultyMember) => f.department === selectedDept);
+      list = list.filter((f) => f.department === selectedDept);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
-        (f: FacultyMember) =>
+        (f) =>
           f.name.toLowerCase().includes(q) ||
           f.qualification.toLowerCase().includes(q) ||
-          f.subjectsTaught.some((s: string) => s.toLowerCase().includes(q)),
+          f.subjectsTaught.some((s) => s.toLowerCase().includes(q)),
       );
     }
     return list;
-  }, [faculty, selectedDept, search]);
+  }, [rawFaculty, selectedDept, search]);
 
   const getInitials = (name: string) =>
     name
@@ -98,9 +129,7 @@ export function FacultyPage() {
                 type="button"
                 key={dept}
                 onClick={() => setSelectedDept(dept)}
-                data-ocid={`faculty.dept.${dept
-                  .toLowerCase()
-                  .replace(/\s+/g, "_")}.button`}
+                data-ocid="faculty.dept.button"
                 className={`glass-btn px-3 py-1.5 text-xs font-medium transition-all ${
                   selectedDept === dept
                     ? "bg-foreground/15 text-foreground"
@@ -127,7 +156,7 @@ export function FacultyPage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && !localFaculty ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             data-ocid="faculty.loading_state"
@@ -153,7 +182,7 @@ export function FacultyPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filtered.map((member: FacultyMember, i: number) => (
+            {filtered.map((member, i) => (
               <div
                 key={`${member.name}-${i}`}
                 className="glass p-5 flex gap-4 hover:scale-[1.01] transition-transform"
@@ -170,26 +199,33 @@ export function FacultyPage() {
                     <Award size={11} />
                     {member.qualification}
                   </div>
+                  {member.designation && (
+                    <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      {member.designation}
+                    </p>
+                  )}
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     <span className="glass-sm px-2 py-0.5 text-xs text-foreground/70 rounded-full">
                       {member.department}
                     </span>
                   </div>
-                  <div className="mt-2">
-                    <p className="text-muted-foreground text-xs mb-1 font-medium">
-                      Subjects:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {member.subjectsTaught.map((subj: string) => (
-                        <span
-                          key={subj}
-                          className="glass-sm px-2 py-0.5 text-xs text-foreground/60 rounded-lg"
-                        >
-                          {subj}
-                        </span>
-                      ))}
+                  {member.subjectsTaught.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-muted-foreground text-xs mb-1 font-medium">
+                        Subjects:
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {member.subjectsTaught.map((subj) => (
+                          <span
+                            key={subj}
+                            className="glass-sm px-2 py-0.5 text-xs text-foreground/60 rounded-lg"
+                          >
+                            {subj}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             ))}

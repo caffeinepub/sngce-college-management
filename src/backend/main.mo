@@ -1,18 +1,14 @@
 import Array "mo:core/Array";
 import Order "mo:core/Order";
 import Text "mo:core/Text";
-import List "mo:core/List";
 import Map "mo:core/Map";
-import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
-import Nat8 "mo:core/Nat8";
 import Float "mo:core/Float";
 import Char "mo:core/Char";
 import Time "mo:core/Time";
 import Int "mo:core/Int";
 import Nat "mo:core/Nat";
 import Nat16 "mo:core/Nat16";
-import Nat32 "mo:core/Nat32";
 import Principal "mo:core/Principal";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -62,29 +58,11 @@ actor {
     yearSemesterBreakdown : [{ yearOrSemester : Text; amount : Float }];
   };
 
-  module FeeStructure {
-    public func compare(fee1 : FeeStructure, fee2 : FeeStructure) : Order.Order {
-      switch (Text.compare(fee1.course.branch, fee2.course.branch)) {
-        case (#equal) { Float.compare(fee1.yearSemesterBreakdown[0].amount, fee2.yearSemesterBreakdown[0].amount) };
-        case (order) { order };
-      };
-    };
-  };
-
   type FacultyMember = {
     name : Text;
     qualification : Text;
     subjectsTaught : [Text];
     department : Text;
-  };
-
-  module FacultyMember {
-    public func compare(fac1 : FacultyMember, fac2 : FacultyMember) : Order.Order {
-      switch (Text.compare(fac1.department, fac2.department)) {
-        case (#equal) { Text.compare(fac1.name, fac2.name) };
-        case (order) { order };
-      };
-    };
   };
 
   type Student = {
@@ -93,12 +71,6 @@ actor {
     lastName : Text;
     department : Text;
     degree : Degree;
-  };
-
-  module Student {
-    public func compare(stu1 : Student, stu2 : Student) : Order.Order {
-      Text.compare(stu1.lastName, stu2.lastName);
-    };
   };
 
   type Subject = {
@@ -110,36 +82,15 @@ actor {
     department : Text;
   };
 
-  module Subject {
-    public func compare(subj1 : Subject, subj2 : Subject) : Order.Order {
-      switch (Text.compare(subj1.department, subj2.department)) {
-        case (#equal) { Text.compare(subj1.name, subj2.name) };
-        case (order) { order };
-      };
-    };
-  };
-
   type Attendance = {
     subjectId : Text;
     percentage : Float;
-  };
-
-  module Attendance {
-    public func compare(att1 : Attendance, att2 : Attendance) : Order.Order {
-      Float.compare(att1.percentage, att2.percentage);
-    };
   };
 
   type Marks = {
     subjectId : Text;
     examType : Text;
     marks : Int;
-  };
-
-  module Marks {
-    public func compare(m1 : Marks, m2 : Marks) : Order.Order {
-      Int.compare(m1.marks, m2.marks);
-    };
   };
 
   type Exam = {
@@ -149,22 +100,10 @@ actor {
     date : Time.Time;
   };
 
-  module Exam {
-    public func compare(exam1 : Exam, exam2 : Exam) : Order.Order {
-      Int.compare(exam1.date, exam2.date);
-    };
-  };
-
   type FeesDue = {
     amount : Float;
     dueDate : Time.Time;
     yearSemester : Text;
-  };
-
-  module FeesDue {
-    public func compare(f1 : FeesDue, f2 : FeesDue) : Order.Order {
-      Float.compare(f1.amount, f2.amount);
-    };
   };
 
   type AcademicRecord = {
@@ -176,69 +115,57 @@ actor {
     feesDue : [FeesDue];
   };
 
-  module AcademicRecord {
-    public func compare(rec1 : AcademicRecord, rec2 : AcademicRecord) : Order.Order {
-      Student.compare(rec1.student, rec2.student);
-    };
-  };
-
   type FAQEntry = {
     keywords : [Text];
     response : Text;
   };
 
-  module FAQEntry {
-    public func compare(faq1 : FAQEntry, faq2 : FAQEntry) : Order.Order {
-      Text.compare(faq1.keywords[0], faq2.keywords[0]);
-    };
-  };
-
   let courses : [Course] = [
-    { branch = "Computer Science Engineering"; degree = #bTech; durationYears = 4 },
-    { branch = "Mechanical Engineering"; degree = #bTech; durationYears = 4 },
-    { branch = "Electrical and Electronics Engineering"; degree = #bTech; durationYears = 4 },
-    { branch = "Electronics and Communication Engineering"; degree = #bTech; durationYears = 4 },
-    { branch = "Civil Engineering"; degree = #bTech; durationYears = 4 },
-    { branch = "Naval Architecture and Ship Building"; degree = #bTech; durationYears = 4 },
-    { branch = "Artificial Intelligence and Cyber Security"; degree = #bTech; durationYears = 4 },
-    { branch = "Computer Applications"; degree = #mba; durationYears = 2 },
-    { branch = "Management Studies"; degree = #mba; durationYears = 2 },
-    { branch = "Electrical Engineering"; degree = #mTech; durationYears = 2 },
+    { branch = "Computer Science Engineering"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Mechanical Engineering"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Electrical and Electronics Engineering"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Electronics and Communication Engineering"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Civil Engineering"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Naval Architecture and Ship Building"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Artificial Intelligence and Cyber Security"; degree = #bTech; durationYears = Nat16.fromNat(4) },
+    { branch = "Computer Applications"; degree = #mba; durationYears = Nat16.fromNat(2) },
+    { branch = "Management Studies"; degree = #mba; durationYears = Nat16.fromNat(2) },
+    { branch = "Electrical Engineering"; degree = #mTech; durationYears = Nat16.fromNat(2) },
   ];
 
   let feeStructures : [FeeStructure] = [
     {
       course = courses[0];
       yearSemesterBreakdown = [
-        { yearOrSemester = "Year 1"; amount = 80000.0 },
-        { yearOrSemester = "Year 2"; amount = 80000.0 },
-        { yearOrSemester = "Year 3"; amount = 75000.0 },
-        { yearOrSemester = "Year 4"; amount = 75000.0 },
+        { yearOrSemester = "Year 1"; amount = 112950.0 },
+        { yearOrSemester = "Year 2"; amount = 112950.0 },
+        { yearOrSemester = "Year 3"; amount = 112950.0 },
+        { yearOrSemester = "Year 4"; amount = 112950.0 },
       ];
     },
     {
       course = courses[1];
       yearSemesterBreakdown = [
-        { yearOrSemester = "Year 1"; amount = 78000.0 },
-        { yearOrSemester = "Year 2"; amount = 78000.0 },
-        { yearOrSemester = "Year 3"; amount = 76000.0 },
-        { yearOrSemester = "Year 4"; amount = 76000.0 },
+        { yearOrSemester = "Year 1"; amount = 112950.0 },
+        { yearOrSemester = "Year 2"; amount = 112950.0 },
+        { yearOrSemester = "Year 3"; amount = 112950.0 },
+        { yearOrSemester = "Year 4"; amount = 112950.0 },
       ];
     },
     {
-      course = courses[2];
+      course = courses[5];
       yearSemesterBreakdown = [
-        { yearOrSemester = "Year 1"; amount = 82000.0 },
-        { yearOrSemester = "Year 2"; amount = 82000.0 },
-        { yearOrSemester = "Year 3"; amount = 80000.0 },
-        { yearOrSemester = "Year 4"; amount = 80000.0 },
+        { yearOrSemester = "Year 1"; amount = 125000.0 },
+        { yearOrSemester = "Year 2"; amount = 125000.0 },
+        { yearOrSemester = "Year 3"; amount = 125000.0 },
+        { yearOrSemester = "Year 4"; amount = 125000.0 },
       ];
     },
     {
       course = courses[9];
       yearSemesterBreakdown = [
-        { yearOrSemester = "Year 1"; amount = 120000.0 },
-        { yearOrSemester = "Year 2"; amount = 120000.0 },
+        { yearOrSemester = "Year 1"; amount = 140000.0 },
+        { yearOrSemester = "Year 2"; amount = 140000.0 },
       ];
     },
     {
@@ -248,15 +175,56 @@ actor {
         { yearOrSemester = "Year 2"; amount = 95000.0 },
       ];
     },
+    {
+      course = courses[7];
+      yearSemesterBreakdown = [
+        { yearOrSemester = "Year 1"; amount = 90000.0 },
+        { yearOrSemester = "Year 2"; amount = 90000.0 },
+      ];
+    },
   ];
 
   let facultyDirectory : [FacultyMember] = [
-    { name = "Alice Thomas"; qualification = "PhD (CSE)"; subjectsTaught = ["Data Structures", "Algorithms"]; department = "Computer Science" },
-    { name = "Rajesh Kumar"; qualification = "MTech (Mechanical)"; subjectsTaught = ["Thermodynamics", "Fluid Mechanics"]; department = "Mechanical Engineering" },
-    { name = "Nisha Pillai"; qualification = "MBA (Finance)"; subjectsTaught = ["Managerial Economics", "Accounting"]; department = "Business Administration" },
+    { name = "Dr. Suresh Kumar"; qualification = "PhD (Mathematics)"; subjectsTaught = ["Engineering Mathematics", "Calculus"]; department = "Science & Humanities" },
+    { name = "Dr. Priya Nair"; qualification = "PhD (Physics)"; subjectsTaught = ["Engineering Physics", "Optics"]; department = "Science & Humanities" },
+    { name = "Prof. Anitha Raj"; qualification = "MSc (Chemistry)"; subjectsTaught = ["Engineering Chemistry"]; department = "Science & Humanities" },
+    { name = "Dr. Rajesh Menon"; qualification = "PhD (CSE)"; subjectsTaught = ["Data Structures", "Algorithms", "DBMS"]; department = "Computer Science" },
+    { name = "Ms. Nisha Pillai"; qualification = "MTech (CSE)"; subjectsTaught = ["Operating Systems", "Computer Networks"]; department = "Computer Science" },
+    { name = "Mr. Arun Thomas"; qualification = "MTech (CSE)"; subjectsTaught = ["Web Technologies", "Cloud Computing"]; department = "Computer Science" },
+    { name = "Dr. Santhosh P"; qualification = "PhD (EEE)"; subjectsTaught = ["Power Systems", "Electrical Machines"]; department = "Electrical & Electronics" },
+    { name = "Ms. Divya Krishnan"; qualification = "MTech (Power Electronics)"; subjectsTaught = ["Power Electronics", "Control Systems"]; department = "Electrical & Electronics" },
+    { name = "Dr. Manoj Kumar"; qualification = "PhD (Mechanical)"; subjectsTaught = ["Thermodynamics", "Fluid Mechanics"]; department = "Mechanical Engineering" },
+    { name = "Mr. Vivek S"; qualification = "MTech (Manufacturing)"; subjectsTaught = ["Manufacturing Technology", "Machine Design"]; department = "Mechanical Engineering" },
+    { name = "Dr. Jayakumar P"; qualification = "PhD (Naval Architecture)"; subjectsTaught = ["Ship Design", "Marine Hydrodynamics"]; department = "Naval Architecture" },
+    { name = "Dr. Aswathy R"; qualification = "PhD (Civil)"; subjectsTaught = ["Structural Engineering", "Concrete Technology"]; department = "Civil Engineering" },
+    { name = "Mr. Sreejith V"; qualification = "MTech (AI)"; subjectsTaught = ["Machine Learning", "Deep Learning"]; department = "AI & Cyber Security" },
   ];
 
-    func canAccessStudentRecord(caller : Principal, studentId : Text) : Bool {
+  public type AdminCourse = {
+    branch : Text;
+    degree : Text;
+    durationYears : Nat;
+    intake : Nat;
+  };
+
+  public type AdminFeeEntry = {
+    courseBranch : Text;
+    yearSemesterBreakdown : [{ yearOrSemester : Text; amount : Float }];
+  };
+
+  public type AdminFacultyMember = {
+    name : Text;
+    qualification : Text;
+    designation : Text;
+    subjectsTaught : [Text];
+    department : Text;
+  };
+
+  stable var adminCourses : [AdminCourse] = [];
+  stable var adminFeeEntries : [AdminFeeEntry] = [];
+  stable var adminFacultyList : [AdminFacultyMember] = [];
+
+  func canAccessStudentRecord(caller : Principal, studentId : Text) : Bool {
     if (AccessControl.isAdmin(accessControlState, caller)) {
       return true;
     };
@@ -287,7 +255,7 @@ actor {
     normalize(text1) == normalize(text2);
   };
 
-  func contains(text : Text, substring : Text) : Bool {
+  func textContains(text : Text, substring : Text) : Bool {
     let textArray = text.toArray();
     let substringArray = substring.toArray();
     let textLen = textArray.size();
@@ -314,22 +282,19 @@ actor {
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can access profiles");
-    };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
+      Runtime.trap("Unauthorized");
     };
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
+      Runtime.trap("Unauthorized");
     };
     userProfiles.add(caller, profile);
     switch (profile.studentId) {
@@ -338,46 +303,105 @@ actor {
     };
   };
 
-  public query ({ caller }) func getAllCourses() : async [Course] {
+  public query func getAllCourses() : async [Course] {
     courses;
   };
 
-  public query ({ caller }) func getAllFeeStructures() : async [FeeStructure] {
-    feeStructures.sort<FeeStructure>();
+  public query func getAllFeeStructures() : async [FeeStructure] {
+    feeStructures;
   };
 
-  public query ({ caller }) func getFeeStructureByCourse(course : Course) : async FeeStructure {
+  public query func getFeeStructureByCourse(course : Course) : async FeeStructure {
     switch (feeStructures.find(func(f) { f.course == course })) {
       case (?structure) { structure };
       case (null) { { course; yearSemesterBreakdown = [] } };
     };
   };
 
-  public query ({ caller }) func getFacultyDirectory() : async [FacultyMember] {
-    facultyDirectory.sort<FacultyMember>();
+  public query func getFacultyDirectory() : async [FacultyMember] {
+    facultyDirectory;
   };
 
-  public query ({ caller }) func getFacultyByDepartment(department : Text) : async [FacultyMember] {
-    facultyDirectory.filter(func(f) { f.department == department }).sort<FacultyMember>();
+  public query func getFacultyByDepartment(department : Text) : async [FacultyMember] {
+    facultyDirectory.filter(func(f) { f.department == department });
+  };
+
+  public query func getAdminCourses() : async [AdminCourse] {
+    adminCourses;
+  };
+
+  public shared ({ caller }) func addAdminCourse(course : AdminCourse) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can add courses");
+    };
+    adminCourses := adminCourses.concat([course]);
+  };
+
+  public shared ({ caller }) func removeAdminCourse(branch : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can remove courses");
+    };
+    adminCourses := adminCourses.filter(func(c) { c.branch != branch });
+  };
+
+  public query func getAdminFeeEntries() : async [AdminFeeEntry] {
+    adminFeeEntries;
+  };
+
+  public shared ({ caller }) func upsertAdminFeeEntry(entry : AdminFeeEntry) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can update fees");
+    };
+    let existing = adminFeeEntries.find(func(f) { f.courseBranch == entry.courseBranch });
+    switch (existing) {
+      case (?_) {
+        adminFeeEntries := adminFeeEntries.map(func(f) {
+          if (f.courseBranch == entry.courseBranch) { entry } else { f }
+        });
+      };
+      case (null) {
+        adminFeeEntries := adminFeeEntries.concat([entry]);
+      };
+    };
+  };
+
+  public query func getAdminFacultyList() : async [AdminFacultyMember] {
+    adminFacultyList;
+  };
+
+  public shared ({ caller }) func addAdminFaculty(member : AdminFacultyMember) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can add faculty");
+    };
+    adminFacultyList := adminFacultyList.concat([member]);
+  };
+
+  public shared ({ caller }) func removeAdminFaculty(name : Text, department : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can remove faculty");
+    };
+    adminFacultyList := adminFacultyList.filter(func(f) {
+      not (f.name == name and f.department == department)
+    });
   };
 
   public shared ({ caller }) func addOrUpdateAcademicRecord(studentId : Text, record : AcademicRecord) : async () {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only staff can add or update records");
+      Runtime.trap("Unauthorized: Only admin can add records");
     };
     academicRecordsStore.add(studentId, record);
   };
 
   public query ({ caller }) func getAllAcademicRecords() : async [AcademicRecord] {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only staff can view all records");
+      Runtime.trap("Unauthorized: Only admin can view all records");
     };
-    academicRecordsStore.values().toArray().sort<AcademicRecord>();
+    academicRecordsStore.values().toArray();
   };
 
   public query ({ caller }) func getStudentRecord(studentId : Text) : async AcademicRecord {
     if (not canAccessStudentRecord(caller, studentId)) {
-      Runtime.trap("Unauthorized: You can only view your own record or you must be staff");
+      Runtime.trap("Unauthorized");
     };
     switch (academicRecordsStore.get(studentId)) {
       case (?record) { record };
@@ -387,7 +411,7 @@ actor {
 
   public query ({ caller }) func getOwnRecord() : async AcademicRecord {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can access records");
+      Runtime.trap("Unauthorized");
     };
     switch (studentPrincipalMap.get(caller)) {
       case (?studentId) {
@@ -400,32 +424,42 @@ actor {
     };
   };
 
+  public query ({ caller }) func getAttendanceByStudent(studentId : Text) : async [Attendance] {
+    if (not canAccessStudentRecord(caller, studentId)) {
+      Runtime.trap("Unauthorized");
+    };
+    switch (academicRecordsStore.get(studentId)) {
+      case (?record) { record.attendance };
+      case (null) { [] };
+    };
+  };
+
+  public query ({ caller }) func getMarksByStudent(studentId : Text) : async [Marks] {
+    if (not canAccessStudentRecord(caller, studentId)) {
+      Runtime.trap("Unauthorized");
+    };
+    switch (academicRecordsStore.get(studentId)) {
+      case (?record) { record.marks };
+      case (null) { [] };
+    };
+  };
+
   public query ({ caller }) func getSubjectsByDepartment(department : Text) : async [Subject] {
     let records = academicRecordsStore.values().toArray();
     let subjectsList = records.foldLeft(
       [] : [Subject],
       func(acc, record) { acc.concat(record.subjects) },
     );
-    subjectsList.filter(func(s) { s.department == department }).sort<Subject>();
+    subjectsList.filter(func(s) { s.department == department });
   };
 
-  public query ({ caller }) func getAttendanceByStudent(studentId : Text) : async [Attendance] {
+  public query ({ caller }) func getFeesDueByStudent(studentId : Text) : async [FeesDue] {
     if (not canAccessStudentRecord(caller, studentId)) {
-      Runtime.trap("Unauthorized: You can only view your own attendance or you must be staff");
+      Runtime.trap("Unauthorized");
     };
     switch (academicRecordsStore.get(studentId)) {
-      case (?record) { record.attendance.sort<Attendance>() };
-      case (null) { Runtime.trap("Student record not found") };
-    };
-  };
-
-  public query ({ caller }) func getMarksByStudent(studentId : Text) : async [Marks] {
-    if (not canAccessStudentRecord(caller, studentId)) {
-      Runtime.trap("Unauthorized: You can only view your own marks or you must be staff");
-    };
-    switch (academicRecordsStore.get(studentId)) {
-      case (?record) { record.marks.sort<Marks>() };
-      case (null) { Runtime.trap("Student record not found") };
+      case (?record) { record.feesDue };
+      case (null) { [] };
     };
   };
 
@@ -435,17 +469,7 @@ actor {
       [] : [Exam],
       func(acc, record) { acc.concat(record.exams) },
     );
-    examsList.filter(func(e) { e.subjectId == department }).sort<Exam>();
-  };
-
-  public query ({ caller }) func getFeesDueByStudent(studentId : Text) : async [FeesDue] {
-    if (not canAccessStudentRecord(caller, studentId)) {
-      Runtime.trap("Unauthorized: You can only view your own fees or you must be staff");
-    };
-    switch (academicRecordsStore.get(studentId)) {
-      case (?record) { record.feesDue.sort<FeesDue>() };
-      case (null) { Runtime.trap("Student record not found") };
-    };
+    examsList.filter(func(e) { e.subjectId == department });
   };
 
   public query ({ caller }) func getDepartmentInfo(department : Text) : async {
@@ -461,7 +485,7 @@ actor {
     {
       courses = courses.filter(func(c) { c.branch == department });
       faculty = facultyDirectory.filter(func(f) { f.department == department });
-      subjects = subjectsList.filter(func(s) { s.department == department }).sort<Subject>();
+      subjects = subjectsList.filter(func(s) { s.department == department });
     };
   };
 
@@ -472,7 +496,7 @@ actor {
     },
     {
       keywords = ["fees", "fee structure"];
-      response = "Fee structure varies by course. Check the 'Fees Structure' section for detailed breakdown.";
+      response = "Fee structure varies by course. B.Tech fees are approximately Rs.1,12,950/year. Naval Architecture is Rs.1,25,000/year. M.Tech is Rs.1,40,000/year.";
     },
     {
       keywords = ["contact", "contact information"];
@@ -480,15 +504,15 @@ actor {
     },
   ];
 
-  public query ({ caller }) func getFAQEntries() : async [FAQEntry] {
-    faqEntries.sort<FAQEntry>();
+  public query func getFAQEntries() : async [FAQEntry] {
+    faqEntries;
   };
 
-  public query ({ caller }) func getChatbotResponse(message : Text) : async Text {
+  public query func getChatbotResponse(message : Text) : async Text {
     let normalizedMessage = normalize(message);
     func findFaqEntry(faq : FAQEntry) : Bool {
       func keywordMatches(keyword : Text) : Bool {
-        contains(normalize(normalizedMessage), normalize(keyword));
+        textContains(normalizedMessage, normalize(keyword));
       };
       switch (faq.keywords.find(keywordMatches)) {
         case (?_) { true };
@@ -498,7 +522,7 @@ actor {
     switch (faqEntries.find(findFaqEntry)) {
       case (?entry) { entry.response };
       case (null) {
-        "Sorry, I didn't understand your question. Please try using different keywords or ask a specific query related to SNGCE.";
+        "I can help you with SNGCE admissions, fees, courses, faculty and placement information.";
       };
     };
   };
