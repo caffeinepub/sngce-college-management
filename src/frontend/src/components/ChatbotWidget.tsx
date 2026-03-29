@@ -8,6 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import { type GroqMessage, callGroq } from "../utils/groqApi";
 
 interface Message {
@@ -17,11 +18,45 @@ interface Message {
   isMulti?: boolean;
 }
 
-const WELCOME: Message = {
-  id: "welcome",
-  role: "bot",
-  text: "Hi! I'm the SNGCE Assistant. Ask me anything about courses, admissions, fees, placements, or general questions!",
-};
+function getWelcome(role: string | null, userName: string | null): Message {
+  let text: string;
+  if (role === "student") {
+    text = `Hi ${userName || "there"}! I can help you with your timetable, attendance calculation, exam schedule, upcoming fests, and anything else about SNGCE. What do you need?`;
+  } else if (role === "staff") {
+    text = `Hello ${userName || "there"}! I can help you navigate the staff panel, enter attendance or marks, understand student records, or answer any college-related questions.`;
+  } else if (role === "admin") {
+    text = `Welcome ${userName || "Admin"}! I can assist with course management, faculty, fees, classified documents, and any institutional queries.`;
+  } else {
+    text =
+      "Hi! I'm the SNGCE Assistant. Ask me anything about courses, admissions, fees, placements, or general questions!";
+  }
+  return { id: "welcome", role: "bot", text };
+}
+
+function getChips(role: string | null): string[] {
+  if (role === "student")
+    return [
+      "My timetable",
+      "Attendance calculator",
+      "Upcoming fests",
+      "Exam schedule",
+    ];
+  if (role === "staff")
+    return [
+      "Enter attendance",
+      "Enter student marks",
+      "View timetable",
+      "Student records",
+    ];
+  if (role === "admin")
+    return [
+      "Manage courses",
+      "Add faculty",
+      "Fee structure",
+      "Classified docs",
+    ];
+  return ["Courses offered", "Fee structure", "Admissions", "Placements"];
+}
 
 function detectMultipleQueries(text: string): boolean {
   const questionMarks = (text.match(/\?/g) || []).length;
@@ -57,11 +92,12 @@ function BotText({ text }: { text: string }) {
   );
 }
 
-const CHIPS = ["Courses offered", "Fee structure", "Admissions", "Placements"];
-
 export function ChatbotWidget() {
+  const { role, studentId, userName } = useAuth();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([WELCOME]);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    getWelcome(role, userName),
+  ]);
   const [input, setInput] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -70,6 +106,11 @@ export function ChatbotWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setMessages([getWelcome(role, userName)]);
+    setHistory([]);
+  }, [role, userName]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scrollRef is stable; messages/isPending are intentional triggers
   useEffect(() => {
@@ -107,7 +148,11 @@ export function ChatbotWidget() {
     ];
 
     try {
-      const result = await callGroq(trimmed, history);
+      const result = await callGroq(trimmed, history, {
+        role,
+        studentId,
+        userName,
+      });
 
       setHistory([...newHistory, { role: "assistant", content: result.text }]);
 
@@ -148,6 +193,8 @@ export function ChatbotWidget() {
     const text = input.trim();
     if (text) send(text);
   };
+
+  const chips = getChips(role);
 
   return (
     <>
@@ -276,7 +323,7 @@ export function ChatbotWidget() {
 
             {messages.length <= 1 && !isPending && (
               <div className="px-3 pb-2 flex gap-1.5 flex-wrap flex-shrink-0">
-                {CHIPS.map((chip) => (
+                {chips.map((chip) => (
                   <button
                     key={chip}
                     type="button"
@@ -298,7 +345,11 @@ export function ChatbotWidget() {
                 onKeyDown={(e) =>
                   e.key === "Enter" && !e.shiftKey && handleSend()
                 }
-                placeholder="Ask anything about SNGCE..."
+                placeholder={
+                  role === "student"
+                    ? "Ask about timetable, attendance..."
+                    : "Ask anything about SNGCE..."
+                }
                 data-ocid="chatbot.input"
                 className="flex-1 glass-sm px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-none"
                 disabled={isPending}
