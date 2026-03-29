@@ -119,7 +119,7 @@ export function HomePage() {
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="fixed inset-0 -z-10">
         <img
-          src="/assets/uploads/college1-3-1.jpg"
+          src="https://sngce.ac.in/user/images/college1.jpg"
           alt="SNGCE College campus"
           className="w-full h-full object-cover"
           style={{
@@ -191,7 +191,7 @@ export function HomePage() {
                   </h2>
                   <span className="inline-flex items-center gap-1 glass-sm px-2 py-0.5 rounded-full text-[10px] font-medium text-muted-foreground">
                     <Sparkles size={10} />
-                    Gemini AI
+                    Pollinations AI
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm mt-0.5">

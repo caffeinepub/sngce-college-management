@@ -1,39 +1,29 @@
-# SNGCE College Management App
+# SNGCE College Management
 
 ## Current State
-
-The app is a full-stack college management portal for Sree Narayana Gurukulam College of Engineering (SNGCE). It includes:
-
-- **SplashPage**: Apple-style welcome animation
-- **HomePage**: Hero + quick nav cards + stats + footer with SNGCE branding
-- **CoursesPage**: Lists all B.Tech/M.Tech/MBA/MCA programs
-- **FeesPage**: Year-wise fee breakdown per program
-- **FacultyPage**: Faculty directory organized by department
-- **LoginPage**: Demo login for students (STU001-STU003) and staff (STAFF001-STAFF002) with credential selection
-- **StudentDashboard**: Attendance, marks, timetable, fees due per student
-- **StaffDashboard**: Edit/add student academic records
-- **ChatbotWidget**: Floating AI chatbot powered by Gemini 2.0 Flash + local fallback engine
-- **Layout**: Navbar with dark/light toggle, chatbot integrated
-- **AuthContext**: localStorage-based auth for demo accounts
-- **ThemeContext**: Dark/light mode toggle
-
-The last deployment failed. The previous build succeeded (Version 5 was deployed) so code should be largely intact.
+Fresh workspace -- full rebuild required.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new requested — this is a retry of the previous failed deployment
+- Full SNGCE College Management app with all previously built features
+- AI chatbot powered by Pollinations AI (free, no API key required)
+- Student, staff, and admin portals with demo logins
+- Real SNGCE data: courses, fees, faculty, placements, recruiters
+- Classified info system (admin sets password, staff views with password)
+- Campus background image from https://sngce.ac.in/user/images/college1.jpg
+- Liquid glass / glassmorphism UI with dark/light mode
+- Apple-style animated splash screen
 
 ### Modify
-- Ensure all existing files are correct and ready to build
-- Verify no broken imports or missing files
+- Chatbot: replace Gemini API with Pollinations AI (https://text.pollinations.ai/) -- free, no key needed
 
 ### Remove
-- Nothing
+- Nothing (fresh build)
 
 ## Implementation Plan
-
-1. Audit existing frontend source files for any issues (broken imports, missing files, TypeScript errors)
-2. Verify backend.d.ts and all page/component files are consistent
-3. Run frontend build to confirm everything compiles
-4. Deploy
+1. Backend: Motoko actor for user auth, academic records, classified docs access control
+2. Frontend: React app with TanStack Router, glassmorphism UI, campus background
+3. Chatbot: calls https://text.pollinations.ai/{prompt}?model=openai (GET) or POST to https://text.pollinations.ai/ with messages array
+4. Pages: Home (chatbot prominent), Login, Courses, Fees, Faculty, Student Dashboard, Staff Dashboard, Admin Dashboard, Classified Info
+5. Demo logins: STU001/pass123, STAFF001/pass123, ADMIN001/admin123

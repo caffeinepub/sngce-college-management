@@ -22,7 +22,8 @@ export function SplashPage() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: "url('/assets/uploads/college1-3-1.jpg')",
+          backgroundImage:
+            "url('https://sngce.ac.in/user/images/college1.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "brightness(0.45) saturate(0.7)",

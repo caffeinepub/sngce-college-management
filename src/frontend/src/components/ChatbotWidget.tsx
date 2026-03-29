@@ -1,24 +1,29 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Bot, Globe, MessageCircle, Navigation, Send, X } from "lucide-react";
+import {
+  Bot,
+  MessageCircle,
+  Navigation,
+  Send,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
-  type GeminiMessage,
-  type GeminiSource,
-  callGemini,
-} from "../utils/geminiApi";
+  type PollinationsMessage,
+  callPollinations,
+} from "../utils/pollinationsApi";
 
 interface Message {
   id: string;
   role: "user" | "bot";
   text: string;
-  sources?: GeminiSource[];
   isMulti?: boolean;
 }
 
 const WELCOME: Message = {
   id: "welcome",
   role: "bot",
-  text: "Hi! I'm the SNGCE Assistant. I can answer anything about the college, courses, admissions, fees, placements, or any education question. What would you like to know?",
+  text: "Hi! I'm the SNGCE Assistant. Ask me anything about courses, admissions, fees, placements, or general questions!",
 };
 
 function detectMultipleQueries(text: string): boolean {
@@ -63,7 +68,7 @@ export function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [history, setHistory] = useState<GeminiMessage[]>([]);
+  const [history, setHistory] = useState<PollinationsMessage[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,26 +104,18 @@ export function ChatbotWidget() {
     setInput("");
     setIsPending(true);
 
-    const userPart: GeminiMessage = {
-      role: "user",
-      parts: [{ text: trimmed }],
-    };
+    const userPart: PollinationsMessage = { role: "user", content: trimmed };
     const newHistory = [...history, userPart];
 
     try {
-      const result = await callGemini(trimmed, history);
+      const result = await callPollinations(trimmed, history);
 
-      const modelPart: GeminiMessage = {
-        role: "model",
-        parts: [
-          {
-            text:
-              result.text +
-              (result.redirect ? ` NAVIGATE:${result.redirect}` : ""),
-          },
-        ],
+      const assistantPart: PollinationsMessage = {
+        role: "assistant",
+        content:
+          result.text + (result.redirect ? ` NAVIGATE:${result.redirect}` : ""),
       };
-      setHistory([...newHistory, modelPart]);
+      setHistory([...newHistory, assistantPart]);
 
       const botMsg: Message = {
         id: `b${Date.now()}`,
@@ -126,10 +123,6 @@ export function ChatbotWidget() {
         text: result.redirect
           ? `${result.text}\n\n*(Taking you there now...)*`
           : result.text,
-        sources:
-          result.sources && result.sources.length > 0
-            ? result.sources
-            : undefined,
       };
       setMessages((prev) => [...prev, botMsg]);
 
@@ -144,12 +137,14 @@ export function ChatbotWidget() {
     } catch (err) {
       const errText = err instanceof Error ? err.message : "Unknown error";
       setErrorMsg(`Couldn't reach AI: ${errText}`);
-      const fallbackMsg: Message = {
-        id: `b${Date.now()}`,
-        role: "bot",
-        text: "I'm having trouble connecting right now. Please try again in a moment.",
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `b${Date.now()}`,
+          role: "bot",
+          text: "I'm having trouble connecting right now. Please try again in a moment.",
+        },
+      ]);
     } finally {
       setIsPending(false);
     }
@@ -196,7 +191,8 @@ export function ChatbotWidget() {
                     </>
                   ) : (
                     <>
-                      <Globe size={10} /> <span>AI with live web search</span>
+                      <Sparkles size={10} />{" "}
+                      <span>Powered by Pollinations AI</span>
                     </>
                   )}
                 </p>
@@ -221,9 +217,7 @@ export function ChatbotWidget() {
                 {messages.map((msg) => (
                   <div key={msg.id} className="flex flex-col">
                     <div
-                      className={`flex ${
-                        msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       {msg.role === "bot" && (
                         <div className="w-6 h-6 rounded-full glass-sm flex items-center justify-center mr-1.5 mt-0.5 flex-shrink-0">
@@ -244,28 +238,6 @@ export function ChatbotWidget() {
                         )}
                       </div>
                     </div>
-
-                    {msg.role === "bot" &&
-                      msg.sources &&
-                      msg.sources.length > 0 && (
-                        <div className="ml-7 mt-1 flex flex-col gap-0.5">
-                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide flex items-center gap-1">
-                            <Globe size={8} /> Sources
-                          </p>
-                          {msg.sources.map((src) => (
-                            <a
-                              key={src.url}
-                              href={src.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[11px] text-foreground/60 hover:text-foreground underline underline-offset-2 truncate max-w-[240px]"
-                            >
-                              {src.title || src.url}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-
                     {msg.isMulti && msg.role === "user" && (
                       <div className="flex justify-end mt-1">
                         <span className="glass-sm text-[10px] text-muted-foreground px-2 py-0.5 rounded-full">
@@ -291,8 +263,8 @@ export function ChatbotWidget() {
                         <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
                       </span>
                       <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                        <Globe size={8} className="animate-pulse" />{" "}
-                        Searching...
+                        <Sparkles size={8} className="animate-pulse" />{" "}
+                        Thinking...
                       </p>
                     </div>
                   </div>
