@@ -8,18 +8,13 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  type GeminiMessage,
-  type GeminiSource,
-  callGemini,
-} from "../utils/geminiApi";
+import { type GroqMessage, callGroq } from "../utils/groqApi";
 
 interface Message {
   id: string;
   role: "user" | "bot";
   text: string;
   isMulti?: boolean;
-  sources?: GeminiSource[];
 }
 
 const WELCOME: Message = {
@@ -70,7 +65,7 @@ export function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [history, setHistory] = useState<GeminiMessage[]>([]);
+  const [history, setHistory] = useState<GroqMessage[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -106,26 +101,15 @@ export function ChatbotWidget() {
     setInput("");
     setIsPending(true);
 
-    const userPart: GeminiMessage = {
-      role: "user",
-      parts: [{ text: trimmed }],
-    };
-    const newHistory = [...history, userPart];
+    const newHistory: GroqMessage[] = [
+      ...history,
+      { role: "user", content: trimmed },
+    ];
 
     try {
-      const result = await callGemini(trimmed, history);
+      const result = await callGroq(trimmed, history);
 
-      const modelPart: GeminiMessage = {
-        role: "model",
-        parts: [
-          {
-            text:
-              result.text +
-              (result.redirect ? ` NAVIGATE:${result.redirect}` : ""),
-          },
-        ],
-      };
-      setHistory([...newHistory, modelPart]);
+      setHistory([...newHistory, { role: "assistant", content: result.text }]);
 
       const botMsg: Message = {
         id: `b${Date.now()}`,
@@ -133,7 +117,6 @@ export function ChatbotWidget() {
         text: result.redirect
           ? `${result.text}\n\n*(Taking you there now...)*`
           : result.text,
-        sources: result.sources,
       };
       setMessages((prev) => [...prev, botMsg]);
 
@@ -202,7 +185,7 @@ export function ChatbotWidget() {
                     </>
                   ) : (
                     <>
-                      <Sparkles size={10} /> <span>Powered by Gemini AI</span>
+                      <Sparkles size={10} /> <span>Powered by Groq AI</span>
                     </>
                   )}
                 </p>
@@ -255,24 +238,6 @@ export function ChatbotWidget() {
                         </span>
                       </div>
                     )}
-                    {msg.role === "bot" &&
-                      msg.sources &&
-                      msg.sources.length > 0 && (
-                        <div className="flex gap-1.5 flex-wrap mt-1 ml-7">
-                          {msg.sources.slice(0, 2).map((src) => (
-                            <a
-                              key={src.url}
-                              href={src.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="glass-sm text-[10px] text-muted-foreground hover:text-foreground px-2 py-0.5 rounded-full truncate max-w-[140px] transition-colors"
-                              title={src.title}
-                            >
-                              🔗 {src.title || src.url}
-                            </a>
-                          ))}
-                        </div>
-                      )}
                   </div>
                 ))}
 
