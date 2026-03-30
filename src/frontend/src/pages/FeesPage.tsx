@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronDown, DollarSign } from "lucide-react";
-import { Degree } from "../backend";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAllFeeStructures } from "../hooks/useQueries";
 
@@ -20,6 +19,176 @@ const degreeLabels: Record<string, string> = {
 interface LocalFeeStructure {
   course: { branch: string; degree: string; durationYears: number };
   yearSemesterBreakdown: { yearOrSemester: string; amount: number }[];
+}
+
+const STATIC_FEES: LocalFeeStructure[] = [
+  {
+    course: {
+      branch: "Computer Science Engineering",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Electronics & Communication Engineering",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: { branch: "Civil Engineering", degree: "bTech", durationYears: 4 },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Electrical & Electronics Engineering",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Mechanical Engineering",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Naval Architecture & Ship Building",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 125000 },
+      { yearOrSemester: "Year 2", amount: 125000 },
+      { yearOrSemester: "Year 3", amount: 125000 },
+      { yearOrSemester: "Year 4", amount: 125000 },
+    ],
+  },
+  {
+    course: {
+      branch: "Artificial Intelligence & Cyber Security",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Industrial Engineering & Management",
+      degree: "bTech",
+      durationYears: 4,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 112950 },
+      { yearOrSemester: "Year 2", amount: 112950 },
+      { yearOrSemester: "Year 3", amount: 112950 },
+      { yearOrSemester: "Year 4", amount: 112950 },
+    ],
+  },
+  {
+    course: {
+      branch: "Computer Science & Engineering (M.Tech)",
+      degree: "mTech",
+      durationYears: 2,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 140000 },
+      { yearOrSemester: "Year 2", amount: 140000 },
+    ],
+  },
+  {
+    course: {
+      branch: "VLSI & Embedded Systems (M.Tech)",
+      degree: "mTech",
+      durationYears: 2,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 140000 },
+      { yearOrSemester: "Year 2", amount: 140000 },
+    ],
+  },
+  {
+    course: {
+      branch: "Structural Engineering (M.Tech)",
+      degree: "mTech",
+      durationYears: 2,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 140000 },
+      { yearOrSemester: "Year 2", amount: 140000 },
+    ],
+  },
+  {
+    course: {
+      branch: "Management Studies (MBA)",
+      degree: "mba",
+      durationYears: 2,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 95000 },
+      { yearOrSemester: "Year 2", amount: 95000 },
+    ],
+  },
+  {
+    course: {
+      branch: "Master of Computer Applications (MCA)",
+      degree: "mca",
+      durationYears: 3,
+    },
+    yearSemesterBreakdown: [
+      { yearOrSemester: "Year 1", amount: 90000 },
+      { yearOrSemester: "Year 2", amount: 90000 },
+      { yearOrSemester: "Year 3", amount: 90000 },
+    ],
+  },
+];
+
+function normalizeDegree(d: unknown): string {
+  if (typeof d === "string") return d;
+  if (d && typeof d === "object") {
+    if ("bTech" in (d as object)) return "bTech";
+    if ("mTech" in (d as object)) return "mTech";
+    if ("mba" in (d as object)) return "mba";
+    if ("mca" in (d as object)) return "mca";
+  }
+  return String(d);
 }
 
 function loadLocalFees(): LocalFeeStructure[] | null {
@@ -46,12 +215,12 @@ export function FeesPage() {
 
   const localFees = loadLocalFees();
 
-  const feeStructures: LocalFeeStructure[] =
+  const rawFees =
     localFees ??
     (backendFees ?? []).map((fs) => ({
       course: {
         branch: fs.course.branch,
-        degree: fs.course.degree as string,
+        degree: normalizeDegree(fs.course.degree),
         durationYears: fs.course.durationYears,
       },
       yearSemesterBreakdown: fs.yearSemesterBreakdown.map((r) => ({
@@ -59,6 +228,9 @@ export function FeesPage() {
         amount: r.amount,
       })),
     }));
+
+  const feeStructures: LocalFeeStructure[] =
+    rawFees.length > 0 ? rawFees : STATIC_FEES;
 
   return (
     <div className="relative min-h-screen">
@@ -97,7 +269,7 @@ export function FeesPage() {
           </p>
         </div>
 
-        {isLoading && !localFees ? (
+        {isLoading && rawFees.length === 0 ? (
           <div className="flex flex-col gap-3" data-ocid="fees.loading_state">
             {Array.from({ length: 4 }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: skeleton loader
@@ -127,21 +299,10 @@ export function FeesPage() {
                 (acc, row) => acc + row.amount,
                 0,
               );
-              const degreeKey =
-                fs.course.degree === Degree.bTech ||
-                fs.course.degree === "bTech"
-                  ? "bTech"
-                  : fs.course.degree === Degree.mTech ||
-                      fs.course.degree === "mTech"
-                    ? "mTech"
-                    : fs.course.degree === Degree.mba ||
-                        fs.course.degree === "mba"
-                      ? "mba"
-                      : (fs.course.degree as string);
-              const key = `${fs.course.branch}-${fs.course.degree}`;
+              const degreeKey = normalizeDegree(fs.course.degree);
               return (
                 <AccordionItem
-                  key={key}
+                  key={`${fs.course.branch}-${fs.course.degree}-${i}`}
                   value={`fee-${i}`}
                   className="glass border-0 rounded-2xl overflow-hidden"
                   data-ocid={`fees.item.${i + 1}`}

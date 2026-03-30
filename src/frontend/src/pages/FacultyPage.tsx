@@ -39,7 +39,6 @@ export function FacultyPage() {
   const [selectedDept, setSelectedDept] = useState<string>("All");
   const [search, setSearch] = useState("");
 
-  const localFaculty = loadLocalFaculty();
   const rawFaculty: LocalFaculty[] = useMemo(() => {
     const lf = loadLocalFaculty();
     return lf ?? (backendFaculty ?? []).map(toDisplayFaculty);
@@ -146,7 +145,7 @@ export function FacultyPage() {
                 data-ocid="faculty.dept.select"
                 className="glass-btn px-3 py-1.5 text-xs font-medium text-foreground bg-transparent outline-none cursor-pointer"
               >
-                {departments.map((d) => (
+                {departments.slice(5).map((d) => (
                   <option key={d} value={d} className="bg-background">
                     {d}
                   </option>
@@ -156,7 +155,7 @@ export function FacultyPage() {
           </div>
         </div>
 
-        {isLoading && !localFaculty ? (
+        {isLoading && !rawFaculty.length ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             data-ocid="faculty.loading_state"

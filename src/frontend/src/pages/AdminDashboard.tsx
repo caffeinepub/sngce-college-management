@@ -15,6 +15,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
@@ -371,7 +372,7 @@ export function AdminDashboard() {
               { key: "courses", label: "Courses", icon: BookOpen },
               { key: "fees", label: "Fees", icon: DollarSign },
               { key: "faculty", label: "Faculty", icon: Users },
-            ] as { key: AdminTab; label: string; icon: React.ElementType }[]
+            ] as { key: AdminTab; label: string; icon: ElementType }[]
           ).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -693,8 +694,8 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
     toast.success("Course added.");
   };
 
-  const handleRemove = (branch: string) => {
-    const updated = courses.filter((c) => c.branch !== branch);
+  const handleRemove = (index: number) => {
+    const updated = courses.filter((_, i) => i !== index);
     setCourses(updated);
     saveLS(COURSES_KEY, updated);
     toast.success("Course removed.");
@@ -841,7 +842,7 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
                     <td className="px-4 py-3">
                       <button
                         type="button"
-                        onClick={() => handleRemove(c.branch)}
+                        onClick={() => handleRemove(i)}
                         data-ocid={`admin.courses.delete_button.${i + 1}`}
                         className="glass-btn p-1.5 text-destructive"
                       >

@@ -12,6 +12,7 @@ import {
   Trash2,
   UserCircle,
 } from "lucide-react";
+import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Degree } from "../backend";
@@ -84,7 +85,7 @@ function makeDefaultRecord(studentId: string): AcademicRecord {
   };
 }
 
-type StaffTab = "overview" | "attendance" | "marks";
+type StaffTab = "overview" | "attendance" | "marks" | "classAttendance";
 
 export function StaffDashboard() {
   const { isLoggedIn, role, userName } = useAuth();
@@ -150,7 +151,12 @@ export function StaffDashboard() {
               { key: "overview", label: "Overview", icon: ShieldCheck },
               { key: "attendance", label: "Attendance", icon: GraduationCap },
               { key: "marks", label: "Marks", icon: BarChart2 },
-            ] as { key: StaffTab; label: string; icon: React.ElementType }[]
+              {
+                key: "classAttendance",
+                label: "Class Attendance",
+                icon: Calendar,
+              },
+            ] as { key: StaffTab; label: string; icon: ElementType }[]
           ).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -174,6 +180,7 @@ export function StaffDashboard() {
           <AttendanceTab inputClass={inputClass} />
         )}
         {activeTab === "marks" && <MarksTab inputClass={inputClass} />}
+        {activeTab === "classAttendance" && <ClassAttendanceTab />}
       </div>
     </div>
   );
@@ -270,7 +277,16 @@ function OverviewTab({ inputClass }: { inputClass: string }) {
       const m = [...prev.marks];
       m[i] = {
         ...m[i],
-        [field]: field === "marks" ? BigInt(String(value)) : value,
+        [field]:
+          field === "marks"
+            ? (() => {
+                try {
+                  return BigInt(Math.round(Number(String(value))) || 0);
+                } catch {
+                  return BigInt(0);
+                }
+              })()
+            : value,
       };
       return { ...prev, marks: m };
     });
@@ -1240,5 +1256,544 @@ function MarksTab({ inputClass }: { inputClass: string }) {
         )}
       </div>
     </>
+  );
+}
+
+const DEPARTMENTS = [
+  "CSE",
+  "ECE",
+  "Civil",
+  "EEE",
+  "Mechanical",
+  "Naval Architecture",
+  "AI & Cyber Security",
+];
+const YEARS = ["Year 1", "Year 2", "Year 3", "Year 4"];
+const LS_CLASS_ATTENDANCE = "sngce_class_attendance";
+
+interface DemoStudent {
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  department: string;
+  year: string;
+}
+
+const DEMO_STUDENTS: DemoStudent[] = [
+  {
+    studentId: "CSE25001",
+    firstName: "Arjun",
+    lastName: "Menon",
+    department: "CSE",
+    year: "Year 1",
+  },
+  {
+    studentId: "CSE25002",
+    firstName: "Priya",
+    lastName: "Krishnan",
+    department: "CSE",
+    year: "Year 1",
+  },
+  {
+    studentId: "CSE25003",
+    firstName: "Rahul",
+    lastName: "Nair",
+    department: "CSE",
+    year: "Year 1",
+  },
+  {
+    studentId: "CSE25004",
+    firstName: "Sneha",
+    lastName: "Pillai",
+    department: "CSE",
+    year: "Year 1",
+  },
+  {
+    studentId: "CSE25005",
+    firstName: "Vishnu",
+    lastName: "Kumar",
+    department: "CSE",
+    year: "Year 1",
+  },
+  {
+    studentId: "CSE24001",
+    firstName: "Aditya",
+    lastName: "Rajan",
+    department: "CSE",
+    year: "Year 2",
+  },
+  {
+    studentId: "CSE24002",
+    firstName: "Meera",
+    lastName: "Suresh",
+    department: "CSE",
+    year: "Year 2",
+  },
+  {
+    studentId: "CSE24003",
+    firstName: "Kiran",
+    lastName: "Thomas",
+    department: "CSE",
+    year: "Year 2",
+  },
+  {
+    studentId: "CSE24004",
+    firstName: "Divya",
+    lastName: "Joseph",
+    department: "CSE",
+    year: "Year 2",
+  },
+  {
+    studentId: "CSE24005",
+    firstName: "Sanjay",
+    lastName: "Varma",
+    department: "CSE",
+    year: "Year 2",
+  },
+  {
+    studentId: "CSE23001",
+    firstName: "Amrita",
+    lastName: "Bose",
+    department: "CSE",
+    year: "Year 3",
+  },
+  {
+    studentId: "CSE23002",
+    firstName: "Rohit",
+    lastName: "Pillai",
+    department: "CSE",
+    year: "Year 3",
+  },
+  {
+    studentId: "CSE23003",
+    firstName: "Nithya",
+    lastName: "Sunil",
+    department: "CSE",
+    year: "Year 3",
+  },
+  {
+    studentId: "CSE22001",
+    firstName: "Abhijith",
+    lastName: "Kumar",
+    department: "CSE",
+    year: "Year 4",
+  },
+  {
+    studentId: "CSE22002",
+    firstName: "Lakshmi",
+    lastName: "Nair",
+    department: "CSE",
+    year: "Year 4",
+  },
+  {
+    studentId: "ECE25001",
+    firstName: "Anjali",
+    lastName: "George",
+    department: "ECE",
+    year: "Year 1",
+  },
+  {
+    studentId: "ECE25002",
+    firstName: "Rohan",
+    lastName: "Mathew",
+    department: "ECE",
+    year: "Year 1",
+  },
+  {
+    studentId: "ECE25003",
+    firstName: "Nandini",
+    lastName: "Raj",
+    department: "ECE",
+    year: "Year 1",
+  },
+  {
+    studentId: "ECE24001",
+    firstName: "Akash",
+    lastName: "Sreekumar",
+    department: "ECE",
+    year: "Year 2",
+  },
+  {
+    studentId: "ECE24002",
+    firstName: "Lakshmi",
+    lastName: "Nambiar",
+    department: "ECE",
+    year: "Year 2",
+  },
+  {
+    studentId: "ECE23001",
+    firstName: "Midhun",
+    lastName: "Raj",
+    department: "ECE",
+    year: "Year 3",
+  },
+  {
+    studentId: "CIV25001",
+    firstName: "Akhil",
+    lastName: "Chandran",
+    department: "Civil",
+    year: "Year 1",
+  },
+  {
+    studentId: "CIV25002",
+    firstName: "Reshma",
+    lastName: "Pillai",
+    department: "Civil",
+    year: "Year 1",
+  },
+  {
+    studentId: "CIV24001",
+    firstName: "Sreejith",
+    lastName: "Mohan",
+    department: "Civil",
+    year: "Year 2",
+  },
+  {
+    studentId: "EEE24001",
+    firstName: "Nikhil",
+    lastName: "Sasi",
+    department: "EEE",
+    year: "Year 2",
+  },
+  {
+    studentId: "EEE24002",
+    firstName: "Parvathy",
+    lastName: "Mohan",
+    department: "EEE",
+    year: "Year 2",
+  },
+  {
+    studentId: "EEE25001",
+    firstName: "Faiz",
+    lastName: "Rahman",
+    department: "EEE",
+    year: "Year 1",
+  },
+  {
+    studentId: "MECH25001",
+    firstName: "Sreejith",
+    lastName: "Babu",
+    department: "Mechanical",
+    year: "Year 1",
+  },
+  {
+    studentId: "MECH25002",
+    firstName: "Athira",
+    lastName: "Nair",
+    department: "Mechanical",
+    year: "Year 1",
+  },
+  {
+    studentId: "MECH24001",
+    firstName: "Joel",
+    lastName: "Joseph",
+    department: "Mechanical",
+    year: "Year 2",
+  },
+  {
+    studentId: "NA25001",
+    firstName: "Sreedev",
+    lastName: "Pillai",
+    department: "Naval Architecture",
+    year: "Year 1",
+  },
+  {
+    studentId: "NA25002",
+    firstName: "Kavya",
+    lastName: "Krishnan",
+    department: "Naval Architecture",
+    year: "Year 1",
+  },
+  {
+    studentId: "AI25001",
+    firstName: "Arun",
+    lastName: "Thomas",
+    department: "AI & Cyber Security",
+    year: "Year 1",
+  },
+  {
+    studentId: "AI25002",
+    firstName: "Deepthi",
+    lastName: "Menon",
+    department: "AI & Cyber Security",
+    year: "Year 1",
+  },
+];
+
+interface ClassAttendanceRecord {
+  studentId: string;
+  name: string;
+  present: boolean;
+}
+
+function ClassAttendanceTab() {
+  const [department, setDepartment] = useState("");
+  const [year, setYear] = useState("");
+  const [subject, setSubject] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [records, setRecords] = useState<ClassAttendanceRecord[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const inputClass =
+    "glass-sm px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground bg-transparent outline-none rounded-xl border-0 w-full";
+
+  const filteredStudents = DEMO_STUDENTS.filter(
+    (s) => s.department === department && s.year === year,
+  );
+
+  function loadClass() {
+    if (!department || !year) return;
+    setRecords(
+      filteredStudents.map((s) => ({
+        studentId: s.studentId,
+        name: `${s.firstName} ${s.lastName}`,
+        present: true,
+      })),
+    );
+    setSubmitted(false);
+  }
+
+  function toggleAll(val: boolean) {
+    setRecords((r) => r.map((rec) => ({ ...rec, present: val })));
+  }
+
+  function toggleOne(studentId: string) {
+    setRecords((r) =>
+      r.map((rec) =>
+        rec.studentId === studentId ? { ...rec, present: !rec.present } : rec,
+      ),
+    );
+  }
+
+  function handleSubmit() {
+    if (!subject.trim()) {
+      toast.error("Please enter a subject name");
+      return;
+    }
+    const presentCount = records.filter((r) => r.present).length;
+    const absentCount = records.length - presentCount;
+    const existing = loadLS<object[]>(LS_CLASS_ATTENDANCE, []);
+    saveLS(LS_CLASS_ATTENDANCE, [
+      ...existing,
+      {
+        department,
+        year,
+        subject,
+        date,
+        records,
+        savedAt: new Date().toISOString(),
+      },
+    ]);
+    toast.success(
+      `Attendance saved: ${presentCount} present, ${absentCount} absent for ${department} ${year} - ${subject}`,
+    );
+    setSubmitted(true);
+  }
+
+  return (
+    <div className="glass rounded-2xl p-5 flex flex-col gap-5">
+      <div>
+        <h2 className="font-display font-semibold text-foreground text-lg mb-1">
+          Class Attendance
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Select a class to mark attendance for all students at once.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="glass-sm rounded-xl overflow-hidden">
+          <select
+            value={department}
+            onChange={(e) => {
+              setDepartment(e.target.value);
+              setRecords([]);
+              setSubmitted(false);
+            }}
+            className={`${inputClass} appearance-none`}
+            style={{
+              background: isDark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.05)",
+            }}
+          >
+            <option value="">Select Department</option>
+            {DEPARTMENTS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="glass-sm rounded-xl overflow-hidden">
+          <select
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value);
+              setRecords([]);
+              setSubmitted(false);
+            }}
+            className={`${inputClass} appearance-none`}
+            style={{
+              background: isDark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.05)",
+            }}
+          >
+            <option value="">Select Year</option>
+            {YEARS.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="glass-sm rounded-xl overflow-hidden">
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Subject (e.g. Data Structures)"
+            className={inputClass}
+          />
+        </div>
+        <div className="glass-sm rounded-xl overflow-hidden">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {department && year && records.length === 0 && (
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={loadClass}
+            className="glass-btn px-5 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-foreground/10 flex items-center gap-2"
+          >
+            <Search size={14} />
+            Load {filteredStudents.length} Students
+          </button>
+          {filteredStudents.length === 0 && (
+            <span className="text-muted-foreground text-sm">
+              No students found for this selection.
+            </span>
+          )}
+        </div>
+      )}
+
+      {records.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-muted-foreground text-sm">
+              {records.length} students loaded
+            </span>
+            <button
+              type="button"
+              onClick={() => toggleAll(true)}
+              className="glass-sm px-3 py-1 text-xs text-foreground rounded-lg hover:bg-foreground/10"
+            >
+              Mark All Present
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleAll(false)}
+              className="glass-sm px-3 py-1 text-xs text-foreground rounded-lg hover:bg-foreground/10"
+            >
+              Mark All Absent
+            </button>
+          </div>
+
+          <div className="glass-sm rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  {["Student ID", "Name", "Status"].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left text-xs text-muted-foreground font-medium px-4 py-2.5"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {records.map((rec, i) => (
+                  <tr
+                    key={rec.studentId}
+                    className={`border-b border-white/5 last:border-0 cursor-pointer transition-colors ${rec.present ? "hover:bg-green-500/5" : "hover:bg-red-500/5"}`}
+                    onClick={() => toggleOne(rec.studentId)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ")
+                        toggleOne(rec.studentId);
+                    }}
+                    data-ocid={`staff.class_attendance.row.${i + 1}`}
+                  >
+                    <td className="px-4 py-3 text-foreground font-mono text-xs">
+                      {rec.studentId}
+                    </td>
+                    <td className="px-4 py-3 text-foreground">{rec.name}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                          rec.present
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {rec.present ? "Present" : "Absent"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-sm text-muted-foreground">
+              <span className="text-green-400 font-medium">
+                {records.filter((r) => r.present).length} present
+              </span>
+              {" · "}
+              <span className="text-red-400 font-medium">
+                {records.filter((r) => !r.present).length} absent
+              </span>
+            </div>
+            {!submitted ? (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="glass-btn px-5 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-foreground/10 flex items-center gap-2"
+              >
+                <Save size={14} />
+                Save Attendance
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setDepartment("");
+                  setYear("");
+                  setSubject("");
+                  setRecords([]);
+                  setSubmitted(false);
+                }}
+                className="glass-btn px-5 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-foreground/10 flex items-center gap-2"
+              >
+                <Plus size={14} />
+                New Attendance
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

@@ -89,6 +89,7 @@ export function LoginPage() {
       }
       login("student", student.name, id.toUpperCase());
       toast.success(`Welcome back, ${student.name}!`);
+      setLoading(false);
       navigate({ to: "/student-dashboard" });
     } else if (activeTab === "admin") {
       const admin = DEMO_ADMIN[id.toUpperCase()];
@@ -99,6 +100,7 @@ export function LoginPage() {
       }
       login("admin", admin.name);
       toast.success(`Welcome, ${admin.name}!`);
+      setLoading(false);
       navigate({ to: "/admin-dashboard" });
     } else {
       const staff = DEMO_STAFF[id.toUpperCase()];
@@ -109,9 +111,9 @@ export function LoginPage() {
       }
       login("staff", staff.name);
       toast.success(`Welcome, ${staff.name}!`);
+      setLoading(false);
       navigate({ to: "/staff-dashboard" });
     }
-    setLoading(false);
   };
 
   return (

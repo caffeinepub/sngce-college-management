@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Clock, GraduationCap } from "lucide-react";
-import { Degree } from "../backend";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAllCourses } from "../hooks/useQueries";
 
@@ -27,6 +26,83 @@ interface LocalCourse {
   intake?: number;
 }
 
+const STATIC_COURSES: LocalCourse[] = [
+  {
+    branch: "Computer Science Engineering",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 180,
+  },
+  {
+    branch: "Electronics & Communication Engineering",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 120,
+  },
+  {
+    branch: "Civil Engineering",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Electrical & Electronics Engineering",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Mechanical Engineering",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Naval Architecture & Ship Building",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 120,
+  },
+  {
+    branch: "Artificial Intelligence & Cyber Security",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Industrial Engineering & Management",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Computer Science & Design",
+    degree: "bTech",
+    durationYears: 4,
+    intake: 60,
+  },
+  {
+    branch: "Computer Science & Engineering",
+    degree: "mTech",
+    durationYears: 2,
+  },
+  { branch: "VLSI & Embedded Systems", degree: "mTech", durationYears: 2 },
+  { branch: "Structural Engineering", degree: "mTech", durationYears: 2 },
+  { branch: "Management Studies", degree: "mba", durationYears: 2 },
+  { branch: "Computer Applications (MCA)", degree: "mca", durationYears: 3 },
+];
+
+function normalizeDegree(d: unknown): string {
+  if (typeof d === "string") return d;
+  if (d && typeof d === "object") {
+    if ("bTech" in (d as object)) return "bTech";
+    if ("mTech" in (d as object)) return "mTech";
+    if ("mba" in (d as object)) return "mba";
+    if ("mca" in (d as object)) return "mca";
+  }
+  return String(d);
+}
+
 function loadLocalCourses(): LocalCourse[] | null {
   try {
     const raw = localStorage.getItem("sngce_courses");
@@ -43,26 +119,20 @@ export function CoursesPage() {
 
   const localCourses = loadLocalCourses();
 
-  const courses = localCourses ?? backendCourses ?? [];
+  const rawCourses = localCourses ?? backendCourses ?? [];
+  const courses: LocalCourse[] =
+    rawCourses.length > 0
+      ? rawCourses.map((c) => ({ ...c, degree: normalizeDegree(c.degree) }))
+      : STATIC_COURSES;
 
-  const allDegrees = Array.from(
-    new Set(courses.map((c) => c.degree as string)),
-  );
-  const degreeKeys = ["bTech", "mTech", "mba", "mca"].filter(
-    (d) =>
-      allDegrees.includes(d) ||
-      allDegrees.includes(Degree[d as keyof typeof Degree]),
-  );
+  const degreeOrder = ["bTech", "mTech", "mba", "mca"];
+  const presentDegrees = new Set(courses.map((c) => c.degree));
+  const tabs = degreeOrder.filter((d) => presentDegrees.has(d));
 
   const grouped: Record<string, LocalCourse[]> = {};
-  for (const key of degreeKeys) {
-    grouped[key] = courses.filter(
-      (c) =>
-        c.degree === key || c.degree === Degree[key as keyof typeof Degree],
-    );
+  for (const key of tabs) {
+    grouped[key] = courses.filter((c) => c.degree === key);
   }
-
-  const tabs = degreeKeys.filter((k) => (grouped[k]?.length ?? 0) > 0);
 
   return (
     <div className="relative min-h-screen">
@@ -102,7 +172,7 @@ export function CoursesPage() {
           </p>
         </div>
 
-        {isLoading && !localCourses ? (
+        {isLoading && rawCourses.length === 0 ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             data-ocid="courses.loading_state"
@@ -168,10 +238,10 @@ export function CoursesPage() {
                           {course.durationYears} Year
                           {course.durationYears > 1 ? "s" : ""} Program
                         </div>
-                        {(course as LocalCourse).intake && (
+                        {course.intake && (
                           <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
                             <GraduationCap size={13} />
-                            Intake: {(course as LocalCourse).intake} seats
+                            Intake: {course.intake} seats
                           </div>
                         )}
                       </div>

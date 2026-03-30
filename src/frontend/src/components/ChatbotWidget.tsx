@@ -104,6 +104,7 @@ export function ChatbotWidget() {
   const [history, setHistory] = useState<GroqMessage[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -168,7 +169,8 @@ export function ChatbotWidget() {
       if (result.redirect) {
         const target = result.redirect;
         setIsNavigating(true);
-        setTimeout(() => {
+        if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+        navTimeoutRef.current = setTimeout(() => {
           setIsNavigating(false);
           navigate({ to: target });
         }, 1500);

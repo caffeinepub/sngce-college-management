@@ -18,6 +18,7 @@ import {
   useExamTimetable,
   useFeesDue,
   useMarksByStudent,
+  useStudentRecord,
 } from "../hooks/useQueries";
 
 function formatDate(time: bigint): string {
@@ -42,17 +43,19 @@ export function StudentDashboard() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const department = "Computer Science";
 
-  useEffect(() => {
-    if (!isLoggedIn || role !== "student") navigate({ to: "/login" });
-  }, [isLoggedIn, role, navigate]);
+  const { data: studentRecord } = useStudentRecord(studentId);
+  const department = studentRecord?.student?.department ?? "Computer Science";
 
   const { data: attendance, isLoading: loadingAttendance } =
     useAttendanceByStudent(studentId);
   const { data: marks, isLoading: loadingMarks } = useMarksByStudent(studentId);
   const { data: exams, isLoading: loadingExams } = useExamTimetable(department);
   const { data: feesDue, isLoading: loadingFees } = useFeesDue(studentId);
+
+  useEffect(() => {
+    if (!isLoggedIn || role !== "student") navigate({ to: "/login" });
+  }, [isLoggedIn, role, navigate]);
 
   if (!isLoggedIn || role !== "student") return null;
 

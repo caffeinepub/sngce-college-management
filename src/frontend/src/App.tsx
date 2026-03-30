@@ -5,10 +5,9 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  redirect,
 } from "@tanstack/react-router";
 import { Layout } from "./components/Layout";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { ClassifiedPage } from "./pages/ClassifiedPage";

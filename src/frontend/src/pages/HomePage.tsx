@@ -27,7 +27,7 @@ const QUICK_CHIPS = [
 
 const navCards = [
   {
-    to: "chatbot",
+    to: "chatbot" as const,
     icon: MessageCircle,
     label: "AI Assistant",
     desc: "Get instant answers",
@@ -36,35 +36,35 @@ const navCards = [
     isHighlighted: true,
   },
   {
-    to: "/courses",
+    to: "/courses" as const,
     icon: BookOpen,
     label: "Courses Offered",
     desc: "B.Tech, M.Tech & MBA programs",
     ocid: "home.courses.card",
   },
   {
-    to: "/fees",
+    to: "/fees" as const,
     icon: DollarSign,
     label: "Fee Structure",
     desc: "Semester-wise fee breakdown",
     ocid: "home.fees.card",
   },
   {
-    to: "/faculty",
+    to: "/faculty" as const,
     icon: Users,
     label: "Faculty Directory",
     desc: "Meet our expert faculty",
     ocid: "home.faculty.card",
   },
   {
-    to: "/login?tab=student",
+    to: "/login" as const,
     icon: GraduationCap,
     label: "Student Portal",
     desc: "Access your academic records",
     ocid: "home.student.card",
   },
   {
-    to: "/login?tab=staff",
+    to: "/login" as const,
     icon: ShieldCheck,
     label: "Staff Portal",
     desc: "Manage student records",
@@ -191,7 +191,7 @@ export function HomePage() {
                   </h2>
                   <span className="inline-flex items-center gap-1 glass-sm px-2 py-0.5 rounded-full text-[10px] font-medium text-muted-foreground">
                     <Sparkles size={10} />
-                    Pollinations AI
+                    Groq AI
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm mt-0.5">
@@ -289,7 +289,11 @@ export function HomePage() {
                 );
               }
               return (
-                <Link key={card.label} to={card.to} data-ocid={card.ocid}>
+                <Link
+                  key={card.label}
+                  to={card.to as "/courses" | "/fees" | "/faculty" | "/login"}
+                  data-ocid={card.ocid}
+                >
                   {CardContent}
                 </Link>
               );
@@ -338,13 +342,13 @@ export function HomePage() {
                 Quick Links
               </h3>
               <div className="flex flex-col gap-1">
-                {["/courses", "/fees", "/faculty"].map((to) => (
+                {(["courses", "fees", "faculty"] as const).map((section) => (
                   <Link
-                    key={to}
-                    to={to}
+                    key={section}
+                    to={`/${section}` as "/courses" | "/fees" | "/faculty"}
                     className="text-muted-foreground text-xs hover:text-foreground transition-colors capitalize"
                   >
-                    {to.replace("/", "")}
+                    {section}
                   </Link>
                 ))}
               </div>
