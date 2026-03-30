@@ -22,6 +22,57 @@ import {
 
 const LS_CLASS_ATTENDANCE = "sngce_class_attendance";
 
+const DEMO_SEEDED_KEY = "sngce_attendance_demo_seeded";
+
+function seedDemoAttendance() {
+  if (localStorage.getItem(DEMO_SEEDED_KEY)) return;
+  const subjects = [
+    "Data Structures",
+    "Operating Systems",
+    "Computer Networks",
+    "Database Management",
+    "Software Engineering",
+    "Compiler Design",
+  ];
+  const students = [
+    { studentId: "CSE23001", name: "Amrita Bose" },
+    { studentId: "CSE23002", name: "Rohit Pillai" },
+    { studentId: "CSE23003", name: "Nithya Sunil" },
+  ];
+  const sessions: ClassSession[] = [];
+  const baseDate = new Date("2026-01-10");
+  subjects.forEach((subject, si) => {
+    const totalClasses = 28 + si;
+    const presentCounts: Record<string, number> = {
+      CSE23001: [24, 26, 20, 27, 22, 25][si],
+      CSE23002: [22, 21, 26, 23, 28, 19][si],
+      CSE23003: [27, 25, 24, 21, 20, 26][si],
+    };
+    for (let c = 0; c < totalClasses; c++) {
+      const d = new Date(baseDate);
+      d.setDate(d.getDate() + c * 2 + si);
+      sessions.push({
+        department: "CSE",
+        year: "Year 3",
+        subject,
+        date: d.toISOString(),
+        records: students.map((s) => ({
+          studentId: s.studentId,
+          name: s.name,
+          present: c < presentCounts[s.studentId],
+        })),
+      });
+    }
+  });
+  const existing = localStorage.getItem("sngce_class_attendance");
+  const existingSessions: ClassSession[] = existing ? JSON.parse(existing) : [];
+  localStorage.setItem(
+    "sngce_class_attendance",
+    JSON.stringify([...existingSessions, ...sessions]),
+  );
+  localStorage.setItem(DEMO_SEEDED_KEY, "1");
+}
+
 interface ClassSession {
   department: string;
   year: string;
@@ -82,6 +133,7 @@ export function StudentDashboard() {
   const { data: studentRecord } = useStudentRecord(studentId);
   const department = studentRecord?.student?.department ?? "Computer Science";
 
+  seedDemoAttendance();
   const attendance = computeAttendance(studentId);
   const loadingAttendance = false;
   const { data: marks, isLoading: loadingMarks } = useMarksByStudent(studentId);
