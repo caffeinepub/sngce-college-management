@@ -9,7 +9,51 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { type GroqMessage, callGroq } from "../utils/groqApi";
+import {
+  useExamTimetable,
+  useFeesDue,
+  useMarksByStudent,
+  useStudentRecord,
+} from "../hooks/useQueries";
+import { type GroqMessage, type StudentData, callGroq } from "../utils/groqApi";
+
+const LS_CLASS_ATTENDANCE = "sngce_class_attendance";
+
+interface ClassSession {
+  department: string;
+  year: string;
+  subject: string;
+  date: string;
+  records: { studentId: string; name: string; present: boolean }[];
+}
+
+function readAttendanceFromLS(
+  studentId: string | null,
+): { subject: string; present: number; total: number; percentage: number }[] {
+  if (!studentId) return [];
+  try {
+    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE);
+    const sessions: ClassSession[] = raw ? JSON.parse(raw) : [];
+    const map: Record<string, { present: number; total: number }> = {};
+    for (const session of sessions) {
+      const rec = session.records.find((r) => r.studentId === studentId);
+      if (!rec) continue;
+      if (!map[session.subject])
+        map[session.subject] = { present: 0, total: 0 };
+      map[session.subject].total++;
+      if (rec.present) map[session.subject].present++;
+    }
+    return Object.entries(map).map(([subject, data]) => ({
+      subject,
+      present: data.present,
+      total: data.total,
+      percentage:
+        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 interface Message {
   id: string;
@@ -21,7 +65,7 @@ interface Message {
 function getWelcome(role: string | null, userName: string | null): Message {
   let text: string;
   if (role === "student") {
-    text = `Hi ${userName || "there"}! I can help you with your timetable, attendance calculation, exam schedule, upcoming fests, and anything else about SNGCE. What do you need?`;
+    text = `Hi ${userName || "there"}! I know your attendance, marks, fees, and timetable. Ask me anything about your academic records or SNGCE in general!`;
   } else if (role === "staff") {
     text = `Hello ${userName || "there"}! I can help you navigate the staff panel, enter attendance or marks, understand student records, or answer any college-related questions.`;
   } else if (role === "admin") {
@@ -35,12 +79,7 @@ function getWelcome(role: string | null, userName: string | null): Message {
 
 function getChips(role: string | null): string[] {
   if (role === "student")
-    return [
-      "My timetable",
-      "Attendance calculator",
-      "Upcoming fests",
-      "Exam schedule",
-    ];
+    return ["My attendance", "My marks", "Fees due", "My timetable"];
   if (role === "staff")
     return [
       "Enter attendance",
@@ -108,6 +147,15 @@ export function ChatbotWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const isStudent = role === "student";
+  const { data: marksData } = useMarksByStudent(isStudent ? studentId : null);
+  const { data: feesData } = useFeesDue(isStudent ? studentId : null);
+  const { data: studentRecord } = useStudentRecord(
+    isStudent ? studentId : null,
+  );
+  const department = studentRecord?.student?.department ?? null;
+  const { data: examsData } = useExamTimetable(isStudent ? department : null);
+
   useEffect(() => {
     setMessages([getWelcome(role, userName)]);
     setHistory([]);
@@ -148,11 +196,47 @@ export function ChatbotWidget() {
       { role: "user", content: trimmed },
     ];
 
+    let studentData: StudentData | undefined = undefined;
+    if (isStudent && studentId) {
+      const attendance = readAttendanceFromLS(studentId);
+      const marks = (marksData ?? []).map(
+        (m: { subjectId: string; examType: string; marks: bigint }) => ({
+          subject: m.subjectId,
+          examType: m.examType,
+          marks: Number(m.marks),
+        }),
+      );
+      const fees = (feesData ?? []).map(
+        (f: { description?: string; amount: number; dueDate?: bigint }) => ({
+          description: f.description ?? "Fee",
+          amount: f.amount,
+        }),
+      );
+      const exams = (examsData ?? []).map(
+        (e: { subjectId: string; examType: string; date: bigint }) => ({
+          subject: e.subjectId,
+          examType: e.examType,
+          date: new Date(Number(e.date) / 1_000_000).toLocaleDateString(
+            "en-IN",
+          ),
+        }),
+      );
+      studentData = {
+        attendance,
+        marks,
+        fees,
+        exams,
+        department: department ?? "Computer Science & Engineering",
+        year: "3rd Year",
+      };
+    }
+
     try {
       const result = await callGroq(trimmed, history, {
         role,
         studentId,
         userName,
+        studentData,
       });
 
       setHistory([...newHistory, { role: "assistant", content: result.text }]);
@@ -349,7 +433,7 @@ export function ChatbotWidget() {
                 }
                 placeholder={
                   role === "student"
-                    ? "Ask about timetable, attendance..."
+                    ? "Ask about attendance, marks, fees..."
                     : "Ask anything about SNGCE..."
                 }
                 data-ocid="chatbot.input"

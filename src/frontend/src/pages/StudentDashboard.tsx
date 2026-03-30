@@ -14,12 +14,47 @@ import type { Attendance, Exam, FeesDue, Marks } from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import {
-  useAttendanceByStudent,
   useExamTimetable,
   useFeesDue,
   useMarksByStudent,
   useStudentRecord,
 } from "../hooks/useQueries";
+
+const LS_CLASS_ATTENDANCE = "sngce_class_attendance";
+
+interface ClassSession {
+  department: string;
+  year: string;
+  subject: string;
+  date: string;
+  records: { studentId: string; name: string; present: boolean }[];
+}
+
+function computeAttendance(
+  studentId: string | null,
+): { subjectId: string; percentage: number }[] {
+  if (!studentId) return [];
+  try {
+    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE);
+    const sessions: ClassSession[] = raw ? JSON.parse(raw) : [];
+    const map: Record<string, { present: number; total: number }> = {};
+    for (const session of sessions) {
+      const rec = session.records.find((r) => r.studentId === studentId);
+      if (!rec) continue;
+      if (!map[session.subject])
+        map[session.subject] = { present: 0, total: 0 };
+      map[session.subject].total++;
+      if (rec.present) map[session.subject].present++;
+    }
+    return Object.entries(map).map(([subject, data]) => ({
+      subjectId: subject,
+      percentage:
+        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 function formatDate(time: bigint): string {
   const ms = Number(time) / 1_000_000;
@@ -47,8 +82,8 @@ export function StudentDashboard() {
   const { data: studentRecord } = useStudentRecord(studentId);
   const department = studentRecord?.student?.department ?? "Computer Science";
 
-  const { data: attendance, isLoading: loadingAttendance } =
-    useAttendanceByStudent(studentId);
+  const attendance = computeAttendance(studentId);
+  const loadingAttendance = false;
   const { data: marks, isLoading: loadingMarks } = useMarksByStudent(studentId);
   const { data: exams, isLoading: loadingExams } = useExamTimetable(department);
   const { data: feesDue, isLoading: loadingFees } = useFeesDue(studentId);

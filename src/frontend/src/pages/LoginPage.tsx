@@ -23,22 +23,25 @@ function getTabFromSearch(): "student" | "staff" | "admin" {
 
 const DEMO_STUDENTS: Record<
   string,
-  { password: string; name: string; dept: string }
+  { password: string; name: string; dept: string; studentId: string }
 > = {
   STU001: {
     password: "pass123",
-    name: "Arjun Menon",
-    dept: "Computer Science",
+    name: "Amrita Bose",
+    dept: "Computer Science & Engineering",
+    studentId: "CSE23001",
   },
   STU002: {
     password: "pass123",
-    name: "Priya Nair",
-    dept: "Electronics & Communication",
+    name: "Rohit Pillai",
+    dept: "Computer Science & Engineering",
+    studentId: "CSE23002",
   },
   STU003: {
     password: "pass123",
-    name: "Rahul Krishnan",
-    dept: "Mechanical Engineering",
+    name: "Nithya Sunil",
+    dept: "Computer Science & Engineering",
+    studentId: "CSE23003",
   },
 };
 
@@ -87,7 +90,7 @@ export function LoginPage() {
         setLoading(false);
         return;
       }
-      login("student", student.name, id.toUpperCase());
+      login("student", student.name, student.studentId);
       toast.success(`Welcome back, ${student.name}!`);
       setLoading(false);
       navigate({ to: "/student-dashboard" });

@@ -1,0 +1,619 @@
+================================================================================
+  SNGCE COLLEGE MANAGEMENT SYSTEM
+  Important Code Blocks for Project Report
+  Sree Narayana Gurukulam College of Engineering, Kadayirippu, Ernakulam
+================================================================================
+
+
+TECH STACK SUMMARY
+==================
+  Layer              Technology
+  -----------------  ------------------------------------------
+  Backend            Motoko (Internet Computer Canister)
+  Database           IC Stable Memory (built-in, no external DB)
+  Frontend           React + TypeScript
+  Routing            TanStack Router
+  UI Components      shadcn/ui + Tailwind CSS
+  State Management   Context API
+  AI Chatbot         Groq API (Llama 3.3-70B)
+  Hosting            Internet Computer (ICP)
+
+
+================================================================================
+  SECTION 1: BACKEND — main.mo (Motoko / Internet Computer)
+================================================================================
+
+1.1 DATA TYPES
+--------------
+
+public type UserProfile = {
+  name : Text;
+  role : Text;
+  studentId : ?Text;
+};
+
+type Student = {
+  studentId : Text;
+  firstName : Text;
+  lastName : Text;
+  department : Text;
+  degree : Degree;
+};
+
+type Subject = {
+  subjectId : Text;
+  name : Text;
+  code : Text;
+  year : Nat;
+  semester : Nat;
+  department : Text;
+};
+
+type Attendance = {
+  subjectId : Text;
+  percentage : Float;
+};
+
+type Marks = {
+  subjectId : Text;
+  examType : Text;
+  marks : Int;
+};
+
+type Exam = {
+  examId : Text;
+  subjectId : Text;
+  examType : Text;
+  date : Time.Time;
+};
+
+type FeesDue = {
+  amount : Float;
+  dueDate : Time.Time;
+  yearSemester : Text;
+};
+
+type AcademicRecord = {
+  student : Student;
+  subjects : [Subject];
+  attendance : [Attendance];
+  marks : [Marks];
+  exams : [Exam];
+  feesDue : [FeesDue];
+};
+
+
+1.2 STABLE STATE (Persistent Storage)
+--------------------------------------
+
+stable var adminCourses : [AdminCourse] = [];
+stable var adminFeeEntries : [AdminFeeEntry] = [];
+stable var adminFacultyList : [AdminFacultyMember] = [];
+
+
+1.3 ACCESS CONTROL
+------------------
+
+func canAccessStudentRecord(caller : Principal, studentId : Text) : Bool {
+  if (AccessControl.isAdmin(accessControlState, caller)) {
+    return true;
+  };
+  switch (studentPrincipalMap.get(caller)) {
+    case (?callerStudentId) { callerStudentId == studentId };
+    case (null) { false };
+  };
+};
+
+
+1.4 PROTECTED QUERY — GET STUDENT RECORD
+-----------------------------------------
+
+public query ({ caller }) func getStudentRecord(studentId : Text) : async AcademicRecord {
+  if (not canAccessStudentRecord(caller, studentId)) {
+    Runtime.trap("Unauthorized");
+  };
+  switch (academicRecordsStore.get(studentId)) {
+    case (?record) { record };
+    case (null) { Runtime.trap("Student record not found") };
+  };
+};
+
+
+1.5 ADMIN CRUD — COURSES
+------------------------
+
+public shared ({ caller }) func addAdminCourse(course : AdminCourse) : async () {
+  if (not AccessControl.isAdmin(accessControlState, caller)) {
+    Runtime.trap("Unauthorized: Only admin can add courses");
+  };
+  adminCourses := adminCourses.concat([course]);
+};
+
+public shared ({ caller }) func removeAdminCourse(branch : Text) : async () {
+  if (not AccessControl.isAdmin(accessControlState, caller)) {
+    Runtime.trap("Unauthorized: Only admin can remove courses");
+  };
+  adminCourses := adminCourses.filter(func(c) { c.branch != branch });
+};
+
+
+1.6 ADMIN CRUD — FEES
+---------------------
+
+public shared ({ caller }) func upsertAdminFeeEntry(entry : AdminFeeEntry) : async () {
+  if (not AccessControl.isAdmin(accessControlState, caller)) {
+    Runtime.trap("Unauthorized: Only admin can update fees");
+  };
+  let existing = adminFeeEntries.find(func(f) { f.courseBranch == entry.courseBranch });
+  switch (existing) {
+    case (?_) {
+      adminFeeEntries := adminFeeEntries.map(func(f) {
+        if (f.courseBranch == entry.courseBranch) { entry } else { f }
+      });
+    };
+    case (null) {
+      adminFeeEntries := adminFeeEntries.concat([entry]);
+    };
+  };
+};
+
+
+1.7 ADMIN CRUD — FACULTY
+------------------------
+
+public shared ({ caller }) func addAdminFaculty(member : AdminFacultyMember) : async () {
+  if (not AccessControl.isAdmin(accessControlState, caller)) {
+    Runtime.trap("Unauthorized: Only admin can add faculty");
+  };
+  adminFacultyList := adminFacultyList.concat([member]);
+};
+
+public shared ({ caller }) func removeAdminFaculty(name : Text, department : Text) : async () {
+  if (not AccessControl.isAdmin(accessControlState, caller)) {
+    Runtime.trap("Unauthorized: Only admin can remove faculty");
+  };
+  adminFacultyList := adminFacultyList.filter(func(f) {
+    not (f.name == name and f.department == department)
+  });
+};
+
+
+1.8 STUDENT-OWNED RECORD QUERY
+-------------------------------
+
+public query ({ caller }) func getOwnRecord() : async AcademicRecord {
+  if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+    Runtime.trap("Unauthorized");
+  };
+  switch (studentPrincipalMap.get(caller)) {
+    case (?studentId) {
+      switch (academicRecordsStore.get(studentId)) {
+        case (?record) { record };
+        case (null) { Runtime.trap("Student record not found") };
+      };
+    };
+    case (null) { Runtime.trap("No student ID associated with this user") };
+  };
+};
+
+
+1.9 CHATBOT FAQ QUERY
+---------------------
+
+public query func getChatbotResponse(message : Text) : async Text {
+  let normalizedMessage = normalize(message);
+  func findFaqEntry(faq : FAQEntry) : Bool {
+    func keywordMatches(keyword : Text) : Bool {
+      textContains(normalizedMessage, normalize(keyword));
+    };
+    switch (faq.keywords.find(keywordMatches)) {
+      case (?_) { true };
+      case (null) { false };
+    };
+  };
+  switch (faqEntries.find(findFaqEntry)) {
+    case (?entry) { entry.response };
+    case (null) {
+      "I can help you with SNGCE admissions, fees, courses, faculty and placement information.";
+    };
+  };
+};
+
+
+================================================================================
+  SECTION 2: FRONTEND — AuthContext.tsx (Role-Based Authentication)
+================================================================================
+
+export type UserRole = "student" | "staff" | "admin" | null;
+
+interface AuthState {
+  isLoggedIn: boolean;
+  role: UserRole;
+  studentId: string | null;
+  userName: string | null;
+}
+
+const AUTH_KEY = "sngce_auth";
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [auth, setAuth] = useState<AuthState>(() => {
+    try {
+      const stored = localStorage.getItem(AUTH_KEY);
+      return stored ? JSON.parse(stored) : defaultState;
+    } catch {
+      return defaultState;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+  }, [auth]);
+
+  const login = useCallback(
+    (role: NonNullable<UserRole>, name: string, studentId?: string) => {
+      setAuth({
+        isLoggedIn: true,
+        role,
+        studentId: studentId ?? null,
+        userName: name,
+      });
+    },
+    [],
+  );
+
+  const logout = useCallback(() => {
+    setAuth(defaultState);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ ...auth, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+
+================================================================================
+  SECTION 3: FRONTEND — groqApi.ts (AI Chatbot with Role-Based Context)
+================================================================================
+
+3.1 INTERFACES
+--------------
+
+export interface StudentAttendanceEntry {
+  subject: string;
+  present: number;
+  total: number;
+  percentage: number;
+}
+
+export interface StudentMarkEntry {
+  subject: string;
+  examType: string;
+  marks: number;
+}
+
+export interface StudentFeeEntry {
+  description: string;
+  amount: number;
+}
+
+export interface StudentExamEntry {
+  subject: string;
+  examType: string;
+  date: string;
+}
+
+export interface StudentData {
+  attendance: StudentAttendanceEntry[];
+  marks: StudentMarkEntry[];
+  fees: StudentFeeEntry[];
+  exams: StudentExamEntry[];
+  department: string;
+  year: string;
+}
+
+export interface UserContext {
+  role?: string | null;
+  studentId?: string | null;
+  userName?: string | null;
+  studentData?: StudentData;
+}
+
+
+3.2 GROQ API CALL WITH ROLE-BASED CONTEXT INJECTION
+----------------------------------------------------
+
+export async function callGroq(
+  userMessage: string,
+  history: GroqMessage[],
+  userContext?: UserContext,
+): Promise<{ text: string; redirect?: string }> {
+  let contextMsg: string | null = null;
+
+  if (userContext?.role === "student") {
+    const sd = userContext.studentData;
+    let dataBlock = "";
+    if (sd) {
+      const attLines =
+        sd.attendance.length > 0
+          ? sd.attendance
+              .map(
+                (a) =>
+                  `  - ${a.subject}: ${a.present}/${a.total} classes attended (${a.percentage}%)`,
+              )
+              .join("\n")
+          : "  - No attendance records yet";
+
+      const marksLines =
+        sd.marks.length > 0
+          ? sd.marks
+              .map((m) => `  - ${m.subject} [${m.examType}]: ${m.marks} marks`)
+              .join("\n")
+          : "  - No marks recorded yet";
+
+      const feesLines =
+        sd.fees.length > 0
+          ? sd.fees
+              .map((f) => `  - ${f.description}: Rs.${f.amount}`)
+              .join("\n")
+          : "  - No outstanding fees";
+
+      const examLines =
+        sd.exams.length > 0
+          ? sd.exams
+              .map((e) => `  - ${e.subject} [${e.examType}] on ${e.date}`)
+              .join("\n")
+          : "  - No upcoming exams scheduled";
+
+      dataBlock = `
+
+STUDENT ACADEMIC DATA (real-time from the system):
+Department: ${sd.department}
+Year: ${sd.year}
+
+Subject-wise Attendance:
+${attLines}
+
+Marks/Grades:
+${marksLines}
+
+Fees Due:
+${feesLines}
+
+Upcoming Exams:
+${examLines}`;
+    }
+    contextMsg = `ACTIVE USER: Student "${userContext.userName}".
+Student ID: ${userContext.studentId}.${sd ? dataBlock : ""}`;
+
+  } else if (userContext?.role === "staff") {
+    contextMsg = `ACTIVE USER: Staff "${userContext.userName}".
+    Full access to student records. Help with attendance and marks entry.`;
+
+  } else if (userContext?.role === "admin") {
+    contextMsg = `ACTIVE USER: Admin "${userContext.userName}".
+    Full institutional access. Help with course, faculty, fees, classified management.`;
+  }
+
+  const messages = [
+    { role: "system" as const, content: SYSTEM_PROMPT },
+    ...history,
+    ...(contextMsg ? [{ role: "system" as const, content: contextMsg }] : []),
+    { role: "user" as const, content: userMessage },
+  ];
+
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages,
+      temperature: 0.8,
+      max_tokens: 1500,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Groq API ${response.status}`);
+  }
+
+  const data = await response.json();
+  const rawText: string = data?.choices?.[0]?.message?.content ?? "";
+
+  const navigateMatch = rawText.match(/NAVIGATE:(\S+)/);
+  const redirect = navigateMatch ? navigateMatch[1] : undefined;
+  const text = rawText.replace(/NAVIGATE:\S+/g, "").trim();
+
+  return { text, redirect };
+}
+
+
+================================================================================
+  SECTION 4: FRONTEND — ChatbotWidget.tsx (Chat UI Component)
+================================================================================
+
+4.1 ATTENDANCE READ FROM LOCAL STORAGE (Staff-entered data)
+------------------------------------------------------------
+
+function readAttendanceFromLS(
+  studentId: string | null,
+): { subject: string; present: number; total: number; percentage: number }[] {
+  if (!studentId) return [];
+  try {
+    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE);
+    const sessions: ClassSession[] = raw ? JSON.parse(raw) : [];
+    const map: Record<string, { present: number; total: number }> = {};
+    for (const session of sessions) {
+      const rec = session.records.find((r) => r.studentId === studentId);
+      if (!rec) continue;
+      if (!map[session.subject])
+        map[session.subject] = { present: 0, total: 0 };
+      map[session.subject].total++;
+      if (rec.present) map[session.subject].present++;
+    }
+    return Object.entries(map).map(([subject, data]) => ({
+      subject,
+      present: data.present,
+      total: data.total,
+      percentage:
+        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+
+4.2 ROLE-SPECIFIC WELCOME MESSAGE
+----------------------------------
+
+function getWelcome(role: string | null, userName: string | null): Message {
+  let text: string;
+  if (role === "student") {
+    text = `Hi ${userName}! I know your attendance, marks, fees, and timetable.
+    Ask me anything about your academic records or SNGCE in general!`;
+  } else if (role === "staff") {
+    text = `Hello ${userName}! I can help you navigate the staff panel,
+    enter attendance or marks, understand student records, or answer any college-related questions.`;
+  } else if (role === "admin") {
+    text = `Welcome ${userName}! I can assist with course management, faculty,
+    fees, classified documents, and any institutional queries.`;
+  } else {
+    text = "Hi! I'm the SNGCE Assistant. Ask me anything about courses,
+    admissions, fees, placements, or general questions!";
+  }
+  return { id: "welcome", role: "bot", text };
+}
+
+
+4.3 ROLE-SPECIFIC QUICK CHIPS
+------------------------------
+
+function getChips(role: string | null): string[] {
+  if (role === "student")
+    return ["My attendance", "My marks", "Fees due", "My timetable"];
+  if (role === "staff")
+    return ["Enter attendance", "Enter student marks", "View timetable", "Student records"];
+  if (role === "admin")
+    return ["Manage courses", "Add faculty", "Fee structure", "Classified docs"];
+  return ["Courses offered", "Fee structure", "Admissions", "Placements"];
+}
+
+
+4.4 MULTI-QUERY DETECTION
+--------------------------
+
+function detectMultipleQueries(text: string): boolean {
+  const questionMarks = (text.match(/\?/g) || []).length;
+  if (questionMarks >= 2) return true;
+  return (
+    /\b(also|and also|what about|plus|another question)\b/i.test(text) &&
+    text.includes("?")
+  );
+}
+
+
+================================================================================
+  SECTION 5: FRONTEND — StaffDashboard.tsx (Class Attendance)
+================================================================================
+
+5.1 ATTENDANCE COMPUTATION PER STUDENT
+---------------------------------------
+
+function computeStudentAttendance(
+  studentId: string,
+): { subject: string; present: number; total: number; percentage: number }[] {
+  try {
+    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE_STAFF);
+    const sessions: StaffClassSession[] = raw ? JSON.parse(raw) : [];
+    const map: Record<string, { present: number; total: number }> = {};
+    for (const session of sessions) {
+      const rec = session.records.find((r) => r.studentId === studentId);
+      if (!rec) continue;
+      if (!map[session.subject])
+        map[session.subject] = { present: 0, total: 0 };
+      map[session.subject].total++;
+      if (rec.present) map[session.subject].present++;
+    }
+    return Object.entries(map).map(([subject, data]) => ({
+      subject,
+      present: data.present,
+      total: data.total,
+      percentage:
+        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+
+5.2 DEMO STUDENTS FOR STAFF OVERVIEW
+--------------------------------------
+
+const DEMO_OVERVIEW_STUDENTS = [
+  { studentId: "CSE23001", name: "Amrita Bose",   year: "Year 3", department: "CSE" },
+  { studentId: "CSE23002", name: "Rohit Pillai",  year: "Year 3", department: "CSE" },
+  { studentId: "CSE23003", name: "Nithya Sunil",  year: "Year 3", department: "CSE" },
+];
+
+
+================================================================================
+  SECTION 6: FRONTEND — StudentDashboard.tsx (Attendance Progress View)
+================================================================================
+
+{attendance.map((a: Attendance, i: number) => {
+  const pct = Math.round(a.percentage);
+  const isLow = pct < 75;
+  return (
+    <div
+      key={`${a.subjectId}-${i}`}
+      className={`glass p-4 flex flex-col sm:flex-row sm:items-center gap-3
+        ${isLow ? "border border-amber-500/30" : ""}`}
+    >
+      <div className="sm:w-48 flex-shrink-0 flex items-center gap-2">
+        {isLow && <AlertTriangle size={14} className="text-amber-500 shrink-0" />}
+        <span className="text-sm font-medium text-foreground">
+          {a.subjectId}
+        </span>
+      </div>
+      <div className="flex-1 flex items-center gap-3">
+        <Progress
+          value={pct}
+          className={`h-2 flex-1 ${isLow ? "bg-amber-500/10" : "bg-foreground/10"}`}
+        />
+        <span className={`text-sm font-bold w-10 text-right
+          ${isLow ? "text-amber-400" : "text-foreground"}`}>
+          {pct}%
+        </span>
+      </div>
+    </div>
+  );
+})}
+
+
+================================================================================
+  SECTION 7: DEMO LOGIN CREDENTIALS
+================================================================================
+
+  Role     Username    Password
+  -------  ----------  ----------
+  Student  STU001      pass123     (Amrita Bose, CSE Year 3, ID: CSE23001)
+  Student  STU002      pass123     (Rohit Pillai, CSE Year 3, ID: CSE23002)
+  Student  STU003      pass123     (Nithya Sunil, CSE Year 3, ID: CSE23003)
+  Staff    STAFF001    pass123
+  Admin    ADMIN001    admin123
+
+
+================================================================================
+  END OF REPORT
+  Built with love by SNGCE
+================================================================================
