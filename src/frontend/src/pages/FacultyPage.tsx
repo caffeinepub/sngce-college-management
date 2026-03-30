@@ -13,6 +13,422 @@ interface LocalFaculty {
   subjectsTaught: string[];
 }
 
+const STATIC_FACULTY: LocalFaculty[] = [
+  {
+    name: "Dr. Lissy A",
+    qualification: "PhD",
+    designation: "Professor & Head",
+    department: "Science & Humanities",
+    subjectsTaught: ["Engineering Mathematics"],
+  },
+  {
+    name: "Dr. Bindu K",
+    qualification: "PhD",
+    designation: "Associate Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Engineering Physics"],
+  },
+  {
+    name: "Dr. Suja P",
+    qualification: "PhD",
+    designation: "Associate Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Engineering Chemistry"],
+  },
+  {
+    name: "Ms. Aneena Ann Alex",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Mathematics"],
+  },
+  {
+    name: "Ms. Meera Mohan",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Physics"],
+  },
+  {
+    name: "Ms. Sreelekha C",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Chemistry"],
+  },
+  {
+    name: "Mr. Sijo Joseph",
+    qualification: "MA",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["English"],
+  },
+  {
+    name: "Ms. Anisha Mol P",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Mathematics"],
+  },
+  {
+    name: "Ms. Reshma P R",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Physics"],
+  },
+  {
+    name: "Ms. Nimitha N",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Mathematics"],
+  },
+  {
+    name: "Ms. Aiswarya S",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Chemistry"],
+  },
+  {
+    name: "Mr. Akash Suresh",
+    qualification: "MA",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["English"],
+  },
+  {
+    name: "Ms. Arya B",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Mathematics"],
+  },
+  {
+    name: "Ms. Diya Susan Varghese",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Physics"],
+  },
+  {
+    name: "Ms. Jessy Mariam Jose",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Chemistry"],
+  },
+  {
+    name: "Ms. Liya Mary Mathew",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Mathematics"],
+  },
+  {
+    name: "Ms. Sandra V",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Physics"],
+  },
+  {
+    name: "Ms. Sreedevi V",
+    qualification: "MSc",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["Chemistry"],
+  },
+  {
+    name: "Mr. Vishnu S",
+    qualification: "MA",
+    designation: "Assistant Professor",
+    department: "Science & Humanities",
+    subjectsTaught: ["English"],
+  },
+  {
+    name: "Dr. Vinod P Vijayan",
+    qualification: "PhD (CSE)",
+    designation: "Professor & Head",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Compiler Design", "Theory of Computation"],
+  },
+  {
+    name: "Dr. Seena V",
+    qualification: "PhD (CSE)",
+    designation: "Associate Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Data Mining", "Machine Learning"],
+  },
+  {
+    name: "Mr. Jithin R",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Operating Systems", "Computer Networks"],
+  },
+  {
+    name: "Ms. Anu Maria Jose",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["DBMS", "Web Technologies"],
+  },
+  {
+    name: "Mr. Binil Baby",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Data Structures", "Algorithms"],
+  },
+  {
+    name: "Ms. Deepa P",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Software Engineering", "Cloud Computing"],
+  },
+  {
+    name: "Mr. Gireesh G",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Computer Architecture", "Microprocessors"],
+  },
+  {
+    name: "Ms. Lisha L",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["AI", "Deep Learning"],
+  },
+  {
+    name: "Mr. Midhun P",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Cyber Security", "Cryptography"],
+  },
+  {
+    name: "Ms. Roshni R",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Programming in C", "Python"],
+  },
+  {
+    name: "Mr. Sarath S",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Big Data", "Hadoop"],
+  },
+  {
+    name: "Ms. Sreelakshmi S",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Mobile Computing", "IoT"],
+  },
+  {
+    name: "Mr. Vishnu Prasad P",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "Computer Science & Engineering",
+    subjectsTaught: ["Distributed Systems"],
+  },
+  {
+    name: "Dr. Smitha R",
+    qualification: "PhD (EEE)",
+    designation: "Professor & Head",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Power Systems", "Electrical Machines"],
+  },
+  {
+    name: "Mr. Anil Kumar A",
+    qualification: "MTech (Power Electronics)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Power Electronics", "Drives"],
+  },
+  {
+    name: "Ms. Anupama K",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Control Systems", "Instrumentation"],
+  },
+  {
+    name: "Mr. Biju K",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Circuit Theory", "Electromagnetics"],
+  },
+  {
+    name: "Ms. Divya M",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Power Quality", "Smart Grid"],
+  },
+  {
+    name: "Mr. Jibin Jose",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Renewable Energy", "HVDC"],
+  },
+  {
+    name: "Ms. Nithya R",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Electrical Drawing", "Switchgear"],
+  },
+  {
+    name: "Mr. Rajeev K",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Electrical Workshop"],
+  },
+  {
+    name: "Ms. Sreeja S",
+    qualification: "MTech (EEE)",
+    designation: "Assistant Professor",
+    department: "Electrical & Electronics Engineering",
+    subjectsTaught: ["Utilization of Electrical Energy"],
+  },
+  {
+    name: "Dr. Bino Joseph",
+    qualification: "PhD (ECE)",
+    designation: "Professor & Head",
+    department: "Electronics & Communication Engineering",
+    subjectsTaught: ["VLSI Design", "Embedded Systems"],
+  },
+  {
+    name: "Ms. Anju P",
+    qualification: "MTech (ECE)",
+    designation: "Assistant Professor",
+    department: "Electronics & Communication Engineering",
+    subjectsTaught: ["Digital Signal Processing", "Communication Theory"],
+  },
+  {
+    name: "Mr. Dino George",
+    qualification: "MTech (ECE)",
+    designation: "Assistant Professor",
+    department: "Electronics & Communication Engineering",
+    subjectsTaught: ["Microelectronics", "Analog Circuits"],
+  },
+  {
+    name: "Ms. Leena V",
+    qualification: "MTech (ECE)",
+    designation: "Assistant Professor",
+    department: "Electronics & Communication Engineering",
+    subjectsTaught: ["Wireless Communication", "Antenna Design"],
+  },
+  {
+    name: "Mr. Nithin K",
+    qualification: "MTech (ECE)",
+    designation: "Assistant Professor",
+    department: "Electronics & Communication Engineering",
+    subjectsTaught: ["Optical Fiber Communication", "Networks"],
+  },
+  {
+    name: "Dr. Pradeep M",
+    qualification: "PhD (Mechanical)",
+    designation: "Professor & Head",
+    department: "Mechanical Engineering",
+    subjectsTaught: ["Thermodynamics", "Heat Transfer"],
+  },
+  {
+    name: "Mr. Ajith K",
+    qualification: "MTech (Manufacturing)",
+    designation: "Assistant Professor",
+    department: "Mechanical Engineering",
+    subjectsTaught: ["Manufacturing Technology", "Metrology"],
+  },
+  {
+    name: "Ms. Asha V",
+    qualification: "MTech (Mechanical)",
+    designation: "Assistant Professor",
+    department: "Mechanical Engineering",
+    subjectsTaught: ["Fluid Mechanics", "Hydraulic Machinery"],
+  },
+  {
+    name: "Mr. Deepak R",
+    qualification: "MTech (Mechanical)",
+    designation: "Assistant Professor",
+    department: "Mechanical Engineering",
+    subjectsTaught: ["Machine Design", "Theory of Machines"],
+  },
+  {
+    name: "Dr. Sujith R",
+    qualification: "PhD (Naval Architecture)",
+    designation: "Professor & Head",
+    department: "Naval Architecture & Ship Building",
+    subjectsTaught: ["Ship Design", "Marine Hydrodynamics"],
+  },
+  {
+    name: "Mr. Anoop S",
+    qualification: "MTech (Naval Architecture)",
+    designation: "Assistant Professor",
+    department: "Naval Architecture & Ship Building",
+    subjectsTaught: ["Stability of Ships", "Resistance & Propulsion"],
+  },
+  {
+    name: "Ms. Revathy R",
+    qualification: "MTech (Naval Architecture)",
+    designation: "Assistant Professor",
+    department: "Naval Architecture & Ship Building",
+    subjectsTaught: ["Ship Production", "Outfitting"],
+  },
+  {
+    name: "Dr. Asha T",
+    qualification: "PhD (Civil)",
+    designation: "Professor & Head",
+    department: "Civil Engineering",
+    subjectsTaught: ["Structural Engineering", "Concrete Technology"],
+  },
+  {
+    name: "Mr. Jijo K",
+    qualification: "MTech (Civil)",
+    designation: "Assistant Professor",
+    department: "Civil Engineering",
+    subjectsTaught: ["Transportation Engineering", "Highway Design"],
+  },
+  {
+    name: "Ms. Nimisha N",
+    qualification: "MTech (Civil)",
+    designation: "Assistant Professor",
+    department: "Civil Engineering",
+    subjectsTaught: ["Environmental Engineering", "Water Supply"],
+  },
+  {
+    name: "Dr. Sreekumar M",
+    qualification: "PhD (AI)",
+    designation: "Professor & Head",
+    department: "AI & Cyber Security",
+    subjectsTaught: ["Machine Learning", "Deep Learning"],
+  },
+  {
+    name: "Ms. Anjali S",
+    qualification: "MTech (CSE)",
+    designation: "Assistant Professor",
+    department: "AI & Cyber Security",
+    subjectsTaught: ["Cyber Security", "Ethical Hacking"],
+  },
+  {
+    name: "Mr. Kevin George",
+    qualification: "MTech (AI)",
+    designation: "Assistant Professor",
+    department: "AI & Cyber Security",
+    subjectsTaught: ["Computer Vision", "NLP"],
+  },
+];
+
 function loadLocalFaculty(): LocalFaculty[] | null {
   try {
     const raw = localStorage.getItem("sngce_faculty");
@@ -41,7 +457,9 @@ export function FacultyPage() {
 
   const rawFaculty: LocalFaculty[] = useMemo(() => {
     const lf = loadLocalFaculty();
-    return lf ?? (backendFaculty ?? []).map(toDisplayFaculty);
+    if (lf && lf.length > 0) return lf;
+    const backend = (backendFaculty ?? []).map(toDisplayFaculty);
+    return backend.length > 0 ? backend : STATIC_FACULTY;
   }, [backendFaculty]);
 
   const departments = useMemo(() => {
@@ -155,7 +573,7 @@ export function FacultyPage() {
           </div>
         </div>
 
-        {isLoading && !rawFaculty.length ? (
+        {isLoading && rawFaculty === STATIC_FACULTY ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             data-ocid="faculty.loading_state"
