@@ -10,12 +10,14 @@ import { Layout } from "./components/Layout";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdmissionsPage } from "./pages/AdmissionsPage";
 import { ClassifiedPage } from "./pages/ClassifiedPage";
 import { CoursesPage } from "./pages/CoursesPage";
 import { FacultyPage } from "./pages/FacultyPage";
 import { FeesPage } from "./pages/FeesPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { PlacementsPage } from "./pages/PlacementsPage";
 import { SplashPage } from "./pages/SplashPage";
 import { StaffDashboard } from "./pages/StaffDashboard";
 import { StudentDashboard } from "./pages/StudentDashboard";
@@ -67,6 +69,18 @@ const facultyRoute = createRoute({
   component: FacultyPage,
 });
 
+const placementsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/placements",
+  component: PlacementsPage,
+});
+
+const admissionsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/admissions",
+  component: AdmissionsPage,
+});
+
 const loginRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/login",
@@ -104,6 +118,8 @@ const routeTree = rootRoute.addChildren([
     coursesRoute,
     feesRoute,
     facultyRoute,
+    placementsRoute,
+    admissionsRoute,
     loginRoute,
     studentDashboardRoute,
     staffDashboardRoute,

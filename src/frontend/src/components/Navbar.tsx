@@ -24,6 +24,8 @@ export function Navbar() {
     { to: "/courses", label: "Courses" },
     { to: "/fees", label: "Fees" },
     { to: "/faculty", label: "Faculty" },
+    { to: "/placements", label: "Placements" },
+    { to: "/admissions", label: "Admissions" },
   ];
 
   const isActive = (to: string) => location.pathname === to;
@@ -31,7 +33,6 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="glass-sm mx-3 mt-3 px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
         <Link
           to="/home"
           data-ocid="nav.home.link"
@@ -47,8 +48,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.to}
@@ -93,9 +93,7 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Right controls */}
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -106,7 +104,6 @@ export function Navbar() {
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {/* Auth */}
           {isLoggedIn ? (
             <div className="flex items-center gap-2">
               <Link
@@ -143,12 +140,11 @@ export function Navbar() {
             </Link>
           )}
 
-          {/* Mobile menu toggle */}
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
             data-ocid="nav.menu.toggle"
-            className="md:hidden glass-btn p-2 text-muted-foreground"
+            className="lg:hidden glass-btn p-2 text-muted-foreground"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={16} /> : <Menu size={16} />}
@@ -156,9 +152,8 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden glass mx-3 mt-1 px-4 py-3 flex flex-col gap-1">
+        <div className="lg:hidden glass mx-3 mt-1 px-4 py-3 flex flex-col gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.to}
