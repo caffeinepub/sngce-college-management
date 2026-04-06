@@ -385,13 +385,13 @@ export function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="glass rounded-2xl p-5 text-center">
               <p className="font-display font-bold text-3xl text-foreground">
-                3,247
+                3,000+
               </p>
               <p className="text-foreground/70 text-sm font-medium mt-0.5">
                 Students Enrolled
               </p>
               <p className="text-muted-foreground text-xs mt-1">
-                Male: 2,254 &nbsp;|&nbsp; Female: 993
+                Across 14 academic programmes
               </p>
             </div>
             <div className="glass rounded-2xl p-5 text-center">
@@ -460,7 +460,7 @@ export function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="glass rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
-              { value: "3,247+", label: "Students Enrolled" },
+              { value: "3,000+", label: "Students Enrolled" },
               { value: "128", label: "Teaching Faculty" },
               { value: "40 Acres", label: "Campus Area" },
               { value: "50+", label: "Labs & Facilities" },

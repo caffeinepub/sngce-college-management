@@ -206,7 +206,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Nov–Dec 2025",
     startDate: "15-11-2025",
     description: "B.Tech S1 (R,S) Exam Time Table (2024 scheme) Dec 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 2,
@@ -217,7 +217,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "26-05-2025",
     description: "B.Tech S1 (S) Examination (2024 scheme) May 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 3,
@@ -228,7 +228,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Apr–May 2025",
     startDate: "05-05-2025",
     description: "B.Tech S2 (R) Examination (2024 scheme) May 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 4,
@@ -239,7 +239,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "05-01-2026",
     description: "B.Tech S2 (S) Examination January 2026 (2024 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 5,
@@ -251,7 +251,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "13-11-2025",
     description:
       "B.Tech S3 (R) Examination Time Table November 2025 (2024 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 6,
@@ -262,7 +262,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "20-01-2026",
     description: "B.Tech S3 (Minor) Examination, Nov 2025 (2024 Admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // ==================== 2019 SCHEME ====================
   // B.Tech 2019 Scheme - S1
@@ -275,7 +275,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2023",
     startDate: "19-12-2023",
     description: "B.Tech S1 (R,S) Examinations (2019 scheme) December 2023",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 8,
@@ -287,7 +287,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "02-12-2025",
     description:
       "B.Tech S1 (S,FE) S2 (S,FE) Dec 2025 examination (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S2
   {
@@ -300,7 +300,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "10-06-2023",
     description:
       "B.Tech S2 Regular and Supplementary Examinations June 2023 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 10,
@@ -311,7 +311,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2025",
     startDate: "08-01-2026",
     description: "B.Tech S2 (PT) (S,FE) Exam Dec 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S3
   {
@@ -323,7 +323,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2023",
     startDate: "19-12-2023",
     description: "B.Tech S3 (R,S) Examinations (2019 scheme) December 2023",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 12,
@@ -334,7 +334,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Nov–Dec 2025",
     startDate: "02-12-2025",
     description: "B.Tech S3 (S,FE) Examinations November 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 13,
@@ -345,7 +345,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Apr–May 2025",
     startDate: "31-05-2025",
     description: "B.Tech S3 (S,FE) Exam Time Table (2019 Scheme) May 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S4
   {
@@ -358,7 +358,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "10-06-2022",
     description:
       "B.Tech S4 Regular and Supplementary Examinations June 2022 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 15,
@@ -369,7 +369,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2024",
     startDate: "08-01-2024",
     description: "B.Tech S4 (S,FE) Exam January 2024 (2019 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 16,
@@ -380,7 +380,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "27-05-2025",
     description: "B.Tech S4 Honours Exam Time Table May 2025 (2023 admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 17,
@@ -391,7 +391,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "29-05-2025",
     description: "B.Tech S4 Minor Exam Time Table May 2025 (2023 admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S5
   {
@@ -403,7 +403,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Nov 2025",
     startDate: "12-11-2025",
     description: "B.Tech S5 (R,S) Examinations November 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 19,
@@ -414,7 +414,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "22-05-2025",
     description: "B.Tech S5 (S,FE) Exam Time Table May 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 20,
@@ -425,7 +425,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "13-01-2026",
     description: "B.Tech S5 (Honours) Examinations Nov 2025 (2023 Admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 21,
@@ -436,7 +436,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "20-01-2026",
     description: "B.Tech S5 (Minor) Examination Nov 2025 (2023 Admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S6
   {
@@ -449,7 +449,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "22-04-2026",
     description:
       "B.Tech S6 Regular & Supplementary Examinations April 2026 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 23,
@@ -460,7 +460,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2025",
     startDate: "15-12-2025",
     description: "B.Tech S6 (S,FE) Exam Time Table (2019 scheme) Dec 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 24,
@@ -471,7 +471,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "27-05-2025",
     description: "B.Tech S6 Honours Exam Time Table May 2025 (2022 admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 25,
@@ -482,7 +482,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May 2025",
     startDate: "29-05-2025",
     description: "B.Tech S6 Minor Exam Time Table May 2025 (2022 admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S7
   {
@@ -494,7 +494,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Nov 2025",
     startDate: "14-11-2025",
     description: "B.Tech S7 (R,S) Examinations November 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 27,
@@ -505,7 +505,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Apr 2025",
     startDate: "02-04-2025",
     description: "B.Tech S7 (S,FE) Exam Time Table April 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 28,
@@ -516,7 +516,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "13-01-2026",
     description: "B.Tech S7 (Honours) Examinations Nov 2025 (2022 Admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 29,
@@ -527,7 +527,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "20-01-2026",
     description: "B.Tech S7 (Minor) Examination Nov 2025 (2022 Admission)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // B.Tech 2019 Scheme - S8
   {
@@ -540,7 +540,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "16-04-2025",
     description:
       "Revised B.Tech S8 (R,S) Exam Time Table April 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 31,
@@ -551,7 +551,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Sep 2025",
     startDate: "24-09-2025",
     description: "B.Tech S8 (S) Exam September 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // Part-Time B.Tech 2019
   {
@@ -564,7 +564,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "02-08-2025",
     description:
       "Part Time B.Tech S1,S3,S5 (S,FE) Supplementary Exam Time Table May 2025 (2019 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 33,
@@ -576,7 +576,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "08-01-2024",
     description:
       "B.Tech Part-Time S2(S), S4(S), S6(S) Examinations (2019 scheme), January 2024",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // ==================== 2015 SCHEME ====================
   // B.Tech 2015 Scheme - Special/Supplementary
@@ -590,7 +590,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "01-08-2025",
     description:
       "B.Tech S1,S2 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 35,
@@ -601,7 +601,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Aug 2025",
     startDate: "02-08-2025",
     description: "B.Tech S3 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 36,
@@ -612,7 +612,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Aug 2025",
     startDate: "12-08-2025",
     description: "B.Tech S4 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 37,
@@ -623,7 +623,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Aug 2025",
     startDate: "01-08-2025",
     description: "B.Tech S5 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 38,
@@ -634,7 +634,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Aug 2025",
     startDate: "02-08-2025",
     description: "B.Tech S6 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 39,
@@ -645,7 +645,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Aug 2025",
     startDate: "04-08-2025",
     description: "B.Tech S7 Special Exam Time Table August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 40,
@@ -657,7 +657,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "05-08-2025",
     description:
       "B.Tech S8 Special Examination August 2025 (2015 scheme) incl. Part-Time",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 41,
@@ -669,7 +669,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "02-08-2025",
     description:
       "B.Tech S1–S7 Part-Time (S,FE) Exam Time August 2025 (2015 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // ==================== M.TECH ====================
   {
@@ -681,7 +681,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2025",
     startDate: "29-12-2025",
     description: "M.Tech S1 (R,S) Exam Time Table December 2025 (2022 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 43,
@@ -692,7 +692,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May–Aug 2025",
     startDate: "31-07-2025",
     description: "M.Tech S2 (R,S) Exam Time Table May 2025 (2022 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 44,
@@ -703,7 +703,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "14-01-2026",
     description: "M.Tech S2 (S,FE) Examinations Jan 2026 (2022 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 45,
@@ -715,7 +715,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "10-09-2025",
     description:
       "M.Tech S1 (Special Exam) August 2025 (2015 Scheme) incl. Part-Time",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 46,
@@ -727,7 +727,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "20-09-2025",
     description:
       "M.Tech S3 (Special Exam) August 2025 (2015 Scheme) incl. Part-Time",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // ==================== MBA ====================
   {
@@ -739,7 +739,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May–Jun 2025",
     startDate: "26-05-2025",
     description: "MBA S1 (S,FE) & MBA S2 (R,S) Examination May/June 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 48,
@@ -750,7 +750,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May–Jun 2025",
     startDate: "26-05-2025",
     description: "MBA S2 (R,S) Examination May/June 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 49,
@@ -761,7 +761,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "03-01-2026",
     description: "MBA S2 (S,FE) JAN 2026 (2020 SCHEME)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 50,
@@ -772,7 +772,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "May–Jun 2025",
     startDate: "27-05-2025",
     description: "MBA S3 (S,FE) Incl. PT Exam Time Table May/June 2025",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 51,
@@ -783,7 +783,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Apr–May 2025",
     startDate: "21-04-2025",
     description: "MBA S4 (R,S) April/May 2025 Including MBA S4 (PT) (S,FE)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 52,
@@ -794,7 +794,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "17-01-2026",
     description: "MBA S4 (S,FE) Incl PT Examination Jan 2026 (2020 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   // ==================== MCA ====================
   {
@@ -806,7 +806,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Dec 2025",
     startDate: "15-12-2025",
     description: "MCA 2 Year S1 (R,S) Exam Time Table Dec 2025 (2020 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 54,
@@ -817,7 +817,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "05-01-2026",
     description: "MCA 2 Year S2 (S,FE) Exam Dec 2025 (2020 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 55,
@@ -829,7 +829,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "18-11-2025",
     description:
       "MCA Integrated S3(R,S), S5(R,S), S7(R,S) & S9(R,S) examination Nov 2025 (2020 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 56,
@@ -840,7 +840,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     examPeriod: "Jan 2026",
     startDate: "09-01-2026",
     description: "MCA Integrated S4 (S,FE) Dec 2025 (2020 scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 57,
@@ -852,7 +852,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "02-02-2026",
     description:
       "Revised Detailed Time Table MCA Integrated S8 (S,FE) examination Jan 2026 (2020 Scheme)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
   {
     id: 58,
@@ -864,7 +864,7 @@ const KTU_TIMETABLES: TimetableEntry[] = [
     startDate: "04-06-2025",
     description:
       "MCA Integrated exam time table (2020 Scheme) May/June 2025 – Even (R,S)/Odd (S,FE)",
-    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+    downloadLink: "https://ktu.edu.in/exam/timetable",
   },
 ];
 
@@ -1050,7 +1050,7 @@ export default function KTUPage() {
                   </span>{" "}
                   to open the official KTU exam timetable portal at{" "}
                   <a
-                    href="https://app.ktu.edu.in/eu/pub/examtimetable.htm"
+                    href="https://ktu.edu.in/exam/timetable"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-foreground underline underline-offset-2"

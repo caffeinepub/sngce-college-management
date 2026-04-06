@@ -386,7 +386,7 @@ export function AdminDashboard() {
 function ClassifiedTab({ inputClass }: { inputClass: string }) {
   const { actor } = useActor();
   const [items, setItems] = useState<ClassifiedDoc[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [content, setContent] = useState("");
@@ -396,6 +396,7 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
 
   useEffect(() => {
     if (!actor) return;
+    setLoading(true);
     (actor as any)
       .getClassifiedDocs()
       .then(setItems)
@@ -674,7 +675,7 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
 function CoursesTab({ inputClass }: { inputClass: string }) {
   const { actor } = useActor();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [branch, setBranch] = useState("");
   const [degree, setDegree] = useState("bTech");
   const [durationYears, setDurationYears] = useState(4);
@@ -682,6 +683,7 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
 
   useEffect(() => {
     if (!actor) return;
+    setLoading(true);
     (actor as any)
       .getAdminCourses()
       .then(async (result) => {
@@ -907,7 +909,7 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
 function FeesTab({ inputClass }: { inputClass: string }) {
   const { actor } = useActor();
   const [fees, setFees] = useState<AdminFeeEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editRows, setEditRows] = useState<
     { yearOrSemester: string; amount: number }[]
@@ -915,6 +917,7 @@ function FeesTab({ inputClass }: { inputClass: string }) {
 
   useEffect(() => {
     if (!actor) return;
+    setLoading(true);
     (actor as any)
       .getAdminFeeEntries()
       .then(async (result) => {
@@ -1089,7 +1092,7 @@ function FeesTab({ inputClass }: { inputClass: string }) {
 function FacultyTab({ inputClass }: { inputClass: string }) {
   const { actor } = useActor();
   const [faculty, setFaculty] = useState<AdminFacultyMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [qualification, setQualification] = useState("");
   const [designation, setDesignation] = useState("");
@@ -1098,6 +1101,7 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
 
   useEffect(() => {
     if (!actor) return;
+    setLoading(true);
     (actor as any)
       .getAdminFacultyList()
       .then(async (result) => {
