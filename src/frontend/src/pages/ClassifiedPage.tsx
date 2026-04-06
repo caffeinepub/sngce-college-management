@@ -1,21 +1,12 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, FileText, Lock, ShieldAlert, Unlock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type { ClassifiedDoc } from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import type { ClassifiedItem } from "./AdminDashboard";
-
-const CLASSIFIED_KEY = "sngce_classified";
-
-function loadItems(): ClassifiedItem[] {
-  try {
-    const raw = localStorage.getItem(CLASSIFIED_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
+import { useActor } from "../hooks/useActor";
 
 const CATEGORY_COLORS: Record<string, string> = {
   "Internal Circular": "text-blue-400",
@@ -31,8 +22,10 @@ export function ClassifiedPage() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { actor } = useActor();
 
-  const [items] = useState<ClassifiedItem[]>(loadItems);
+  const [items, setItems] = useState<ClassifiedDoc[]>([]);
+  const [loading, setLoading] = useState(true);
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [passwordInputs, setPasswordInputs] = useState<Record<string, string>>(
     {},
@@ -46,9 +39,18 @@ export function ClassifiedPage() {
     }
   }, [isLoggedIn, role, navigate]);
 
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getClassifiedDocs()
+      .then((docs: ClassifiedDoc[]) => setItems(docs))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
+
   if (!isLoggedIn || (role !== "staff" && role !== "admin")) return null;
 
-  const handleUnlock = (item: ClassifiedItem) => {
+  const handleUnlock = (item: ClassifiedDoc) => {
     const entered = (passwordInputs[item.id] ?? "").trim();
     if (entered === item.uniquePassword) {
       setUnlockedIds((prev) => {
@@ -101,7 +103,6 @@ export function ClassifiedPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <img
           src="https://sngce.ac.in/user/images/college1.jpg"
@@ -123,7 +124,6 @@ export function ClassifiedPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
         <div className="glass rounded-2xl p-5 mb-6 flex items-center gap-4">
           <div className="glass-sm w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">
             <ShieldAlert size={20} className="text-foreground/70" />
@@ -144,7 +144,6 @@ export function ClassifiedPage() {
           </div>
         </div>
 
-        {/* Info notice */}
         <div className="glass-sm rounded-xl px-4 py-3 mb-6 flex items-start gap-2.5">
           <Lock size={14} className="text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-xs text-muted-foreground">
@@ -157,8 +156,20 @@ export function ClassifiedPage() {
           </p>
         </div>
 
-        {/* Empty state */}
-        {items.length === 0 ? (
+        {loading ? (
+          <div
+            className="flex flex-col gap-4"
+            data-ocid="classified.loading_state"
+          >
+            {[1, 2, 3].map((k) => (
+              <div key={k} className="glass rounded-2xl p-5">
+                <Skeleton className="h-5 w-48 mb-2 bg-foreground/10" />
+                <Skeleton className="h-4 w-full mb-1 bg-foreground/10" />
+                <Skeleton className="h-10 w-full bg-foreground/10" />
+              </div>
+            ))}
+          </div>
+        ) : items.length === 0 ? (
           <div
             className="glass rounded-2xl p-12 flex flex-col items-center gap-3 text-center"
             data-ocid="classified.empty_state"
@@ -188,7 +199,6 @@ export function ClassifiedPage() {
                   className="glass rounded-2xl overflow-hidden"
                   data-ocid={`classified.item.${idx + 1}`}
                 >
-                  {/* Item header */}
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -226,7 +236,6 @@ export function ClassifiedPage() {
                     </div>
                   </div>
 
-                  {/* Unlocked content */}
                   {isUnlocked && (
                     <div className="px-5 pb-4">
                       <div className="glass-sm rounded-xl p-4 mb-3">
@@ -246,7 +255,6 @@ export function ClassifiedPage() {
                     </div>
                   )}
 
-                  {/* Password input when locked */}
                   {!isUnlocked && (
                     <div className="px-5 pb-5">
                       <div className="flex gap-2">

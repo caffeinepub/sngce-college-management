@@ -99,6 +99,28 @@ export interface AdminFacultyMember {
     subjectsTaught: Array<string>;
     department: string;
 }
+export interface ClassifiedDoc {
+    id: string;
+    title: string;
+    category: string;
+    content: string;
+    uniquePassword: string;
+    createdAt: string;
+}
+export interface AttendanceRecord {
+    studentId: string;
+    name: string;
+    present: boolean;
+}
+export interface ClassAttendanceSession {
+    id: string;
+    department: string;
+    year: string;
+    subject: string;
+    date: string;
+    savedAt: string;
+    records: Array<AttendanceRecord>;
+}
 export enum Degree {
     mba = "mba",
     bTech = "bTech",
@@ -145,4 +167,10 @@ export interface backendInterface {
     removeAdminFaculty(name: string, department: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     upsertAdminFeeEntry(entry: AdminFeeEntry): Promise<void>;
+    getClassifiedDocs(): Promise<Array<ClassifiedDoc>>;
+    addClassifiedDoc(doc: ClassifiedDoc): Promise<void>;
+    removeClassifiedDoc(id: string): Promise<void>;
+    getAttendanceSessions(): Promise<Array<ClassAttendanceSession>>;
+    getSessionsByDepartmentYear(department: string, year: string): Promise<Array<ClassAttendanceSession>>;
+    addAttendanceSession(session: ClassAttendanceSession): Promise<void>;
 }

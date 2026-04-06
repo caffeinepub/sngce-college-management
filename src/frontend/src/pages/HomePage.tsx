@@ -72,6 +72,70 @@ const navCards = [
   },
 ];
 
+const FACILITIES = [
+  {
+    emoji: "🏠",
+    label: "Hostels",
+    desc: "Separate boys & girls hostels on campus",
+  },
+  {
+    emoji: "📚",
+    label: "Library",
+    desc: "15,847+ volumes, digital resources, reading room",
+  },
+  {
+    emoji: "💻",
+    label: "Computer Labs",
+    desc: "11 dedicated labs incl. Data Centre, Linux Lab, CAD Lab",
+  },
+  {
+    emoji: "🏋️",
+    label: "Gymnasium",
+    desc: "Modern fitness facility for students",
+  },
+  {
+    emoji: "🍽️",
+    label: "Cafeteria",
+    desc: "Subsidized meals, multiple outlets",
+  },
+  { emoji: "🏥", label: "Medical Centre", desc: "On-campus health facility" },
+  {
+    emoji: "🏟️",
+    label: "Auditorium",
+    desc: "Large-capacity auditorium for events",
+  },
+  {
+    emoji: "🏅",
+    label: "Sports",
+    desc: "Cricket, football, basketball, badminton courts; NCC unit",
+  },
+  { emoji: "📡", label: "Wi-Fi", desc: "Campus-wide internet connectivity" },
+  {
+    emoji: "🔬",
+    label: "Research Labs",
+    desc: "ECE: 8 labs · EEE: 10 labs · Mech: 10 labs · Civil: 5 labs · Naval: 4 labs",
+  },
+];
+
+const ACCREDITATIONS = [
+  {
+    label: "AICTE Approved",
+    color: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  },
+  {
+    label: "NBA Accredited",
+    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  },
+  {
+    label: "KTU Affiliated",
+    color: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  },
+  {
+    label: "Est. 2002 by SNDP Union",
+    color: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  },
+];
+
 function openChatbotWithMessage(message: string) {
   const openBtn = document.querySelector<HTMLButtonElement>(
     '[data-ocid="chatbot.open_modal_button"]',
@@ -302,14 +366,104 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Campus Infrastructure Section */}
+      <section
+        className="px-4 sm:px-6 pb-16"
+        data-ocid="home.infrastructure.section"
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="font-display font-bold text-2xl sm:text-3xl text-foreground mb-1">
+              Our Campus &amp; Infrastructure
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              A world-class learning environment
+            </p>
+          </div>
+
+          {/* Headline stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="glass rounded-2xl p-5 text-center">
+              <p className="font-display font-bold text-3xl text-foreground">
+                3,247
+              </p>
+              <p className="text-foreground/70 text-sm font-medium mt-0.5">
+                Students Enrolled
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                Male: 2,254 &nbsp;|&nbsp; Female: 993
+              </p>
+            </div>
+            <div className="glass rounded-2xl p-5 text-center">
+              <p className="font-display font-bold text-3xl text-foreground">
+                128
+              </p>
+              <p className="text-foreground/70 text-sm font-medium mt-0.5">
+                Teaching Faculty
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                Student-Faculty Ratio 23:1
+              </p>
+            </div>
+            <div className="glass rounded-2xl p-5 text-center">
+              <p className="font-display font-bold text-3xl text-foreground">
+                40 Acres
+              </p>
+              <p className="text-foreground/70 text-sm font-medium mt-0.5">
+                Campus Area
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                165,400 sq ft constructed area
+              </p>
+            </div>
+          </div>
+
+          {/* Facilities grid */}
+          <div className="glass rounded-2xl p-6 mb-5">
+            <h3 className="font-display font-semibold text-foreground text-base mb-4">
+              Facilities &amp; Infrastructure
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {FACILITIES.map((facility) => (
+                <div
+                  key={facility.label}
+                  className="glass-sm rounded-xl p-3 flex flex-col gap-1.5"
+                >
+                  <span className="text-xl">{facility.emoji}</span>
+                  <p className="font-semibold text-foreground text-xs">
+                    {facility.label}
+                  </p>
+                  <p className="text-muted-foreground text-[11px] leading-snug">
+                    {facility.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Accreditations */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            {ACCREDITATIONS.map((acc) => (
+              <span
+                key={acc.label}
+                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border ${acc.color}`}
+              >
+                {acc.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Updated stats strip */}
       <section className="px-4 sm:px-6 pb-16">
         <div className="max-w-5xl mx-auto">
           <div className="glass rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
-              { value: "23+", label: "Years of Excellence" },
-              { value: "3000+", label: "Students Enrolled" },
-              { value: "150+", label: "Faculty Members" },
-              { value: "10", label: "Departments" },
+              { value: "3,247+", label: "Students Enrolled" },
+              { value: "128", label: "Teaching Faculty" },
+              { value: "40 Acres", label: "Campus Area" },
+              { value: "50+", label: "Labs & Facilities" },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="font-display font-bold text-3xl text-foreground">

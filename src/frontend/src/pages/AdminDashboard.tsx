@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -18,13 +19,15 @@ import {
 import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type {
+  AdminCourse,
+  AdminFacultyMember,
+  AdminFeeEntry,
+  ClassifiedDoc,
+} from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-
-const CLASSIFIED_KEY = "sngce_classified";
-const COURSES_KEY = "sngce_courses";
-const FEES_KEY = "sngce_fees";
-const FACULTY_KEY = "sngce_faculty";
+import { useActor } from "../hooks/useActor";
 
 const CATEGORIES = [
   "Internal Circular",
@@ -34,15 +37,6 @@ const CATEGORIES = [
   "Administrative Order",
   "Financial Report",
 ];
-
-export interface ClassifiedItem {
-  id: string;
-  title: string;
-  category: string;
-  content: string;
-  uniquePassword: string;
-  createdAt: string;
-}
 
 export interface LocalCourse {
   branch: string;
@@ -283,19 +277,6 @@ const DEFAULT_FACULTY: LocalFaculty[] = [
   },
 ];
 
-function loadLS<T>(key: string, def: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : def;
-  } catch {
-    return def;
-  }
-}
-
-function saveLS<T>(key: string, val: T) {
-  localStorage.setItem(key, JSON.stringify(val));
-}
-
 const degreeLabels: Record<string, string> = {
   bTech: "B.Tech",
   mTech: "M.Tech",
@@ -403,9 +384,9 @@ export function AdminDashboard() {
 }
 
 function ClassifiedTab({ inputClass }: { inputClass: string }) {
-  const [items, setItems] = useState<ClassifiedItem[]>(() =>
-    loadLS(CLASSIFIED_KEY, []),
-  );
+  const { actor } = useActor();
+  const [items, setItems] = useState<ClassifiedDoc[]>([]);
+  const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [content, setContent] = useState("");
@@ -413,13 +394,23 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
   const [showNewPass, setShowNewPass] = useState(false);
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
 
-  const handleAdd = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getClassifiedDocs()
+      .then(setItems)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!actor) return;
     if (!title.trim() || !content.trim() || !uniquePassword.trim()) {
       toast.error("Please fill in all fields.");
       return;
     }
-    const newItem: ClassifiedItem = {
+    const newItem: ClassifiedDoc = {
       id: `classified_${Date.now()}`,
       title: title.trim(),
       category,
@@ -433,9 +424,9 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
         minute: "2-digit",
       }),
     };
-    const updated = [newItem, ...items];
+    await (actor as any).addClassifiedDoc(newItem);
+    const updated = await (actor as any).getClassifiedDocs();
     setItems(updated);
-    saveLS(CLASSIFIED_KEY, updated);
     setTitle("");
     setCategory(CATEGORIES[0]);
     setContent("");
@@ -443,10 +434,11 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
     toast.success("Classified item added.");
   };
 
-  const handleDelete = (id: string) => {
-    const updated = items.filter((item) => item.id !== id);
+  const handleDelete = async (id: string) => {
+    if (!actor) return;
+    await (actor as any).removeClassifiedDoc(id);
+    const updated = await (actor as any).getClassifiedDocs();
     setItems(updated);
-    saveLS(CLASSIFIED_KEY, updated);
     setRevealedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -585,7 +577,20 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
           <FileText size={15} className="text-foreground/70" />
           Classified Documents
         </h2>
-        {items.length === 0 ? (
+        {loading ? (
+          <div
+            className="flex flex-col gap-3"
+            data-ocid="admin.classified.loading_state"
+          >
+            {[1, 2, 3].map((k) => (
+              <div key={k} className="glass rounded-2xl p-5">
+                <Skeleton className="h-5 w-48 mb-2 bg-foreground/10" />
+                <Skeleton className="h-4 w-full mb-1 bg-foreground/10" />
+                <Skeleton className="h-4 w-3/4 bg-foreground/10" />
+              </div>
+            ))}
+          </div>
+        ) : items.length === 0 ? (
           <div
             className="glass rounded-2xl p-10 flex flex-col items-center gap-3 text-center"
             data-ocid="admin.classified.empty_state"
@@ -667,26 +672,55 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
 }
 
 function CoursesTab({ inputClass }: { inputClass: string }) {
-  const [courses, setCourses] = useState<LocalCourse[]>(() =>
-    loadLS(COURSES_KEY, DEFAULT_COURSES),
-  );
+  const { actor } = useActor();
+  const [courses, setCourses] = useState<AdminCourse[]>([]);
+  const [loading, setLoading] = useState(true);
   const [branch, setBranch] = useState("");
   const [degree, setDegree] = useState("bTech");
   const [durationYears, setDurationYears] = useState(4);
   const [intake, setIntake] = useState(60);
 
-  const handleAdd = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getAdminCourses()
+      .then(async (result) => {
+        if (result.length === 0) {
+          await Promise.all(
+            DEFAULT_COURSES.map((c) =>
+              (actor as any).addAdminCourse({
+                branch: c.branch,
+                degree: c.degree,
+                durationYears: BigInt(c.durationYears),
+                intake: BigInt(c.intake),
+              }),
+            ),
+          );
+          const seeded = await (actor as any).getAdminCourses();
+          setCourses(seeded);
+        } else {
+          setCourses(result);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!actor) return;
     if (!branch.trim()) {
       toast.error("Branch name is required.");
       return;
     }
-    const updated = [
-      ...courses,
-      { branch: branch.trim(), degree, durationYears, intake },
-    ];
+    await (actor as any).addAdminCourse({
+      branch: branch.trim(),
+      degree,
+      durationYears: BigInt(durationYears),
+      intake: BigInt(intake),
+    });
+    const updated = await (actor as any).getAdminCourses();
     setCourses(updated);
-    saveLS(COURSES_KEY, updated);
     setBranch("");
     setDegree("bTech");
     setDurationYears(4);
@@ -694,10 +728,11 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
     toast.success("Course added.");
   };
 
-  const handleRemove = (index: number) => {
-    const updated = courses.filter((_, i) => i !== index);
+  const handleRemove = async (courseBranch: string) => {
+    if (!actor) return;
+    await (actor as any).removeAdminCourse(courseBranch);
+    const updated = await (actor as any).getAdminCourses();
     setCourses(updated);
-    saveLS(COURSES_KEY, updated);
     toast.success("Course removed.");
   };
 
@@ -798,7 +833,16 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
             All Courses ({courses.length})
           </span>
         </div>
-        {courses.length === 0 ? (
+        {loading ? (
+          <div
+            className="p-5 flex flex-col gap-2"
+            data-ocid="admin.courses.loading_state"
+          >
+            {[1, 2, 3, 4].map((k) => (
+              <Skeleton key={k} className="h-10 w-full bg-foreground/10" />
+            ))}
+          </div>
+        ) : courses.length === 0 ? (
           <div
             className="p-10 text-center"
             data-ocid="admin.courses.empty_state"
@@ -834,15 +878,15 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
                       {degreeLabels[c.degree] ?? c.degree}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {c.durationYears} yr
+                      {Number(c.durationYears)} yr
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {c.intake}
+                      {Number(c.intake)}
                     </td>
                     <td className="px-4 py-3">
                       <button
                         type="button"
-                        onClick={() => handleRemove(i)}
+                        onClick={() => handleRemove(c.branch)}
                         data-ocid={`admin.courses.delete_button.${i + 1}`}
                         className="glass-btn p-1.5 text-destructive"
                       >
@@ -861,26 +905,52 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
 }
 
 function FeesTab({ inputClass }: { inputClass: string }) {
-  const [fees, setFees] = useState<LocalFeeStructure[]>(() =>
-    loadLS(FEES_KEY, DEFAULT_FEES),
-  );
+  const { actor } = useActor();
+  const [fees, setFees] = useState<AdminFeeEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editRows, setEditRows] = useState<
     { yearOrSemester: string; amount: number }[]
   >([]);
+
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getAdminFeeEntries()
+      .then(async (result) => {
+        if (result.length === 0) {
+          await Promise.all(
+            DEFAULT_FEES.map((f) =>
+              (actor as any).upsertAdminFeeEntry({
+                courseBranch: f.course.branch,
+                yearSemesterBreakdown: f.yearSemesterBreakdown,
+              }),
+            ),
+          );
+          const seeded = await (actor as any).getAdminFeeEntries();
+          setFees(seeded);
+        } else {
+          setFees(result);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
 
   const openEdit = (idx: number) => {
     setEditIdx(idx);
     setEditRows(fees[idx].yearSemesterBreakdown.map((r) => ({ ...r })));
   };
 
-  const saveEdit = () => {
-    if (editIdx === null) return;
-    const updated = fees.map((f, i) =>
-      i === editIdx ? { ...f, yearSemesterBreakdown: editRows } : f,
-    );
+  const saveEdit = async () => {
+    if (editIdx === null || !actor) return;
+    const entry = fees[editIdx];
+    await (actor as any).upsertAdminFeeEntry({
+      courseBranch: entry.courseBranch,
+      yearSemesterBreakdown: editRows,
+    });
+    const updated = await (actor as any).getAdminFeeEntries();
     setFees(updated);
-    saveLS(FEES_KEY, updated);
     setEditIdx(null);
     toast.success("Fees updated.");
   };
@@ -901,7 +971,16 @@ function FeesTab({ inputClass }: { inputClass: string }) {
             Fee Structures
           </span>
         </div>
-        {fees.length === 0 ? (
+        {loading ? (
+          <div
+            className="p-5 flex flex-col gap-2"
+            data-ocid="admin.fees.loading_state"
+          >
+            {[1, 2, 3].map((k) => (
+              <Skeleton key={k} className="h-16 w-full bg-foreground/10" />
+            ))}
+          </div>
+        ) : fees.length === 0 ? (
           <div className="p-10 text-center" data-ocid="admin.fees.empty_state">
             <p className="text-muted-foreground text-sm">
               No fee structures found.
@@ -916,17 +995,16 @@ function FeesTab({ inputClass }: { inputClass: string }) {
               );
               return (
                 <div
-                  key={`${fs.course.branch}-${i}`}
+                  key={`${fs.courseBranch}-${i}`}
                   className="px-5 py-4 flex items-center justify-between gap-3 hover:bg-foreground/5"
                   data-ocid={`admin.fees.item.${i + 1}`}
                 >
                   <div>
                     <p className="font-medium text-foreground text-sm">
-                      {fs.course.branch}
+                      {fs.courseBranch}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {degreeLabels[fs.course.degree] ?? fs.course.degree} ·{" "}
-                      {fs.course.durationYears} yrs · Total {formatRs(total)}
+                      Total {formatRs(total)}
                     </p>
                   </div>
                   <button
@@ -957,7 +1035,7 @@ function FeesTab({ inputClass }: { inputClass: string }) {
           <div className="glass rounded-2xl p-6 w-full max-w-md relative z-10">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-foreground">
-                {fees[editIdx].course.branch}
+                {fees[editIdx].courseBranch}
               </h3>
               <button
                 type="button"
@@ -1009,22 +1087,50 @@ function FeesTab({ inputClass }: { inputClass: string }) {
 }
 
 function FacultyTab({ inputClass }: { inputClass: string }) {
-  const [faculty, setFaculty] = useState<LocalFaculty[]>(() =>
-    loadLS(FACULTY_KEY, DEFAULT_FACULTY),
-  );
+  const { actor } = useActor();
+  const [faculty, setFaculty] = useState<AdminFacultyMember[]>([]);
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [qualification, setQualification] = useState("");
   const [designation, setDesignation] = useState("");
   const [department, setDepartment] = useState("");
   const [subjects, setSubjects] = useState("");
 
-  const handleAdd = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getAdminFacultyList()
+      .then(async (result) => {
+        if (result.length === 0) {
+          await Promise.all(
+            DEFAULT_FACULTY.map((f) =>
+              (actor as any).addAdminFaculty({
+                name: f.name,
+                qualification: f.qualification,
+                designation: f.designation,
+                department: f.department,
+                subjectsTaught: f.subjectsTaught,
+              }),
+            ),
+          );
+          const seeded = await (actor as any).getAdminFacultyList();
+          setFaculty(seeded);
+        } else {
+          setFaculty(result);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!actor) return;
     if (!name.trim() || !department.trim()) {
       toast.error("Name and department are required.");
       return;
     }
-    const newMember: LocalFaculty = {
+    const newMember: AdminFacultyMember = {
       name: name.trim(),
       qualification: qualification.trim(),
       designation: designation.trim(),
@@ -1034,9 +1140,9 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
         .map((s) => s.trim())
         .filter(Boolean),
     };
-    const updated = [...faculty, newMember];
+    await (actor as any).addAdminFaculty(newMember);
+    const updated = await (actor as any).getAdminFacultyList();
     setFaculty(updated);
-    saveLS(FACULTY_KEY, updated);
     setName("");
     setQualification("");
     setDesignation("");
@@ -1045,10 +1151,11 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
     toast.success("Faculty member added.");
   };
 
-  const handleRemove = (idx: number) => {
-    const updated = faculty.filter((_, i) => i !== idx);
+  const handleRemove = async (memberName: string, memberDept: string) => {
+    if (!actor) return;
+    await (actor as any).removeAdminFaculty(memberName, memberDept);
+    const updated = await (actor as any).getAdminFacultyList();
     setFaculty(updated);
-    saveLS(FACULTY_KEY, updated);
     toast.success("Faculty member removed.");
   };
 
@@ -1152,68 +1259,85 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
         </form>
       </div>
 
-      <div className="flex flex-col gap-4">
-        {departments.map((dept) => {
-          const members = faculty.filter((f) => f.department === dept);
-          return (
-            <div key={dept} className="glass rounded-2xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
-                <GraduationCap size={14} className="text-foreground/70" />
-                <span className="font-semibold text-foreground text-sm">
-                  {dept}
-                </span>
-                <span className="glass-sm px-2 py-0.5 rounded-full text-[10px] text-muted-foreground ml-auto">
-                  {members.length}
-                </span>
-              </div>
-              <div className="divide-y divide-white/5">
-                {members.map((member) => {
-                  const globalIdx = faculty.indexOf(member);
-                  return (
-                    <div
-                      key={`${member.name}-${globalIdx}`}
-                      className="px-5 py-3 flex items-center justify-between gap-3 hover:bg-foreground/5"
-                      data-ocid={`admin.faculty.item.${globalIdx + 1}`}
-                    >
-                      <div className="min-w-0">
-                        <p className="font-medium text-foreground text-sm">
-                          {member.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {member.designation} · {member.qualification}
-                        </p>
-                        {member.subjectsTaught.length > 0 && (
-                          <p className="text-xs text-muted-foreground/60 mt-0.5">
-                            {member.subjectsTaught.join(", ")}
-                          </p>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemove(globalIdx)}
-                        data-ocid={`admin.faculty.delete_button.${globalIdx + 1}`}
-                        className="glass-btn p-1.5 text-destructive shrink-0"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+      {loading ? (
+        <div
+          className="flex flex-col gap-3"
+          data-ocid="admin.faculty.loading_state"
+        >
+          {[1, 2, 3].map((k) => (
+            <div key={k} className="glass rounded-2xl p-5">
+              <Skeleton className="h-5 w-32 mb-2 bg-foreground/10" />
+              <Skeleton className="h-4 w-48 mb-1 bg-foreground/10" />
+              <Skeleton className="h-3 w-full bg-foreground/10" />
             </div>
-          );
-        })}
-        {faculty.length === 0 && (
-          <div
-            className="glass rounded-2xl p-10 text-center"
-            data-ocid="admin.faculty.empty_state"
-          >
-            <p className="text-muted-foreground text-sm">
-              No faculty members yet.
-            </p>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {departments.map((dept) => {
+            const members = faculty.filter((f) => f.department === dept);
+            return (
+              <div key={dept} className="glass rounded-2xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
+                  <GraduationCap size={14} className="text-foreground/70" />
+                  <span className="font-semibold text-foreground text-sm">
+                    {dept}
+                  </span>
+                  <span className="glass-sm px-2 py-0.5 rounded-full text-[10px] text-muted-foreground ml-auto">
+                    {members.length}
+                  </span>
+                </div>
+                <div className="divide-y divide-white/5">
+                  {members.map((member) => {
+                    const globalIdx = faculty.indexOf(member);
+                    return (
+                      <div
+                        key={`${member.name}-${globalIdx}`}
+                        className="px-5 py-3 flex items-center justify-between gap-3 hover:bg-foreground/5"
+                        data-ocid={`admin.faculty.item.${globalIdx + 1}`}
+                      >
+                        <div className="min-w-0">
+                          <p className="font-medium text-foreground text-sm">
+                            {member.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {member.designation} · {member.qualification}
+                          </p>
+                          {member.subjectsTaught.length > 0 && (
+                            <p className="text-xs text-muted-foreground/60 mt-0.5">
+                              {member.subjectsTaught.join(", ")}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemove(member.name, member.department)
+                          }
+                          data-ocid={`admin.faculty.delete_button.${globalIdx + 1}`}
+                          className="glass-btn p-1.5 text-destructive shrink-0"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+          {faculty.length === 0 && (
+            <div
+              className="glass rounded-2xl p-10 text-center"
+              data-ocid="admin.faculty.empty_state"
+            >
+              <p className="text-muted-foreground text-sm">
+                No faculty members yet.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }

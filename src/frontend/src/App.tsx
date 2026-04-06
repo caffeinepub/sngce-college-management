@@ -16,6 +16,7 @@ import { CoursesPage } from "./pages/CoursesPage";
 import { FacultyPage } from "./pages/FacultyPage";
 import { FeesPage } from "./pages/FeesPage";
 import { HomePage } from "./pages/HomePage";
+import { KTUPage } from "./pages/KTUPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PlacementsPage } from "./pages/PlacementsPage";
 import { SplashPage } from "./pages/SplashPage";
@@ -69,6 +70,12 @@ const facultyRoute = createRoute({
   component: FacultyPage,
 });
 
+const ktuRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/ktu",
+  component: KTUPage,
+});
+
 const placementsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/placements",
@@ -118,6 +125,7 @@ const routeTree = rootRoute.addChildren([
     coursesRoute,
     feesRoute,
     facultyRoute,
+    ktuRoute,
     placementsRoute,
     admissionsRoute,
     loginRoute,

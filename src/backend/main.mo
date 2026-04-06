@@ -220,9 +220,36 @@ actor {
     department : Text;
   };
 
+  public type ClassifiedDoc = {
+    id : Text;
+    title : Text;
+    category : Text;
+    content : Text;
+    uniquePassword : Text;
+    createdAt : Text;
+  };
+
+  public type AttendanceRecord = {
+    studentId : Text;
+    name : Text;
+    present : Bool;
+  };
+
+  public type ClassAttendanceSession = {
+    id : Text;
+    department : Text;
+    year : Text;
+    subject : Text;
+    date : Text;
+    savedAt : Text;
+    records : [AttendanceRecord];
+  };
+
   stable var adminCourses : [AdminCourse] = [];
   stable var adminFeeEntries : [AdminFeeEntry] = [];
   stable var adminFacultyList : [AdminFacultyMember] = [];
+  stable var classifiedDocs : [ClassifiedDoc] = [];
+  stable var attendanceSessions : [ClassAttendanceSession] = [];
 
   func canAccessStudentRecord(caller : Principal, studentId : Text) : Bool {
     if (AccessControl.isAdmin(accessControlState, caller)) {
@@ -383,6 +410,39 @@ actor {
     adminFacultyList := adminFacultyList.filter(func(f) {
       not (f.name == name and f.department == department)
     });
+  };
+
+  public query func getClassifiedDocs() : async [ClassifiedDoc] {
+    classifiedDocs;
+  };
+
+  public shared ({ caller }) func addClassifiedDoc(doc : ClassifiedDoc) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can add classified documents");
+    };
+    classifiedDocs := classifiedDocs.concat([doc]);
+  };
+
+  public shared ({ caller }) func removeClassifiedDoc(id : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can remove classified documents");
+    };
+    classifiedDocs := classifiedDocs.filter(func(d) { d.id != id });
+  };
+
+  public query func getAttendanceSessions() : async [ClassAttendanceSession] {
+    attendanceSessions;
+  };
+
+  public query func getSessionsByDepartmentYear(department : Text, year : Text) : async [ClassAttendanceSession] {
+    attendanceSessions.filter(func(s) { s.department == department and s.year == year });
+  };
+
+  public shared ({ caller }) func addAttendanceSession(session : ClassAttendanceSession) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    attendanceSessions := attendanceSessions.concat([session]);
   };
 
   public shared ({ caller }) func addOrUpdateAcademicRecord(studentId : Text, record : AcademicRecord) : async () {

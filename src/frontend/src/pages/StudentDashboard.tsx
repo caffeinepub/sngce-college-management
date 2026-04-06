@@ -9,103 +9,22 @@ import {
   DollarSign,
   GraduationCap,
 } from "lucide-react";
-import { useEffect } from "react";
-import type { Attendance, Exam, FeesDue, Marks } from "../backend.d";
+import { useEffect, useState } from "react";
+import type {
+  ClassAttendanceSession,
+  Exam,
+  FeesDue,
+  Marks,
+} from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useActor } from "../hooks/useActor";
 import {
   useExamTimetable,
   useFeesDue,
   useMarksByStudent,
   useStudentRecord,
 } from "../hooks/useQueries";
-
-const LS_CLASS_ATTENDANCE = "sngce_class_attendance";
-
-const DEMO_SEEDED_KEY = "sngce_attendance_demo_seeded";
-
-function seedDemoAttendance() {
-  if (localStorage.getItem(DEMO_SEEDED_KEY)) return;
-  const subjects = [
-    "Data Structures",
-    "Operating Systems",
-    "Computer Networks",
-    "Database Management",
-    "Software Engineering",
-    "Compiler Design",
-  ];
-  const students = [
-    { studentId: "CSE23001", name: "Amrita Bose" },
-    { studentId: "CSE23002", name: "Rohit Pillai" },
-    { studentId: "CSE23003", name: "Nithya Sunil" },
-  ];
-  const sessions: ClassSession[] = [];
-  const baseDate = new Date("2026-01-10");
-  subjects.forEach((subject, si) => {
-    const totalClasses = 28 + si;
-    const presentCounts: Record<string, number> = {
-      CSE23001: [24, 26, 20, 27, 22, 25][si],
-      CSE23002: [22, 21, 26, 23, 28, 19][si],
-      CSE23003: [27, 25, 24, 21, 20, 26][si],
-    };
-    for (let c = 0; c < totalClasses; c++) {
-      const d = new Date(baseDate);
-      d.setDate(d.getDate() + c * 2 + si);
-      sessions.push({
-        department: "CSE",
-        year: "Year 3",
-        subject,
-        date: d.toISOString(),
-        records: students.map((s) => ({
-          studentId: s.studentId,
-          name: s.name,
-          present: c < presentCounts[s.studentId],
-        })),
-      });
-    }
-  });
-  const existing = localStorage.getItem("sngce_class_attendance");
-  const existingSessions: ClassSession[] = existing ? JSON.parse(existing) : [];
-  localStorage.setItem(
-    "sngce_class_attendance",
-    JSON.stringify([...existingSessions, ...sessions]),
-  );
-  localStorage.setItem(DEMO_SEEDED_KEY, "1");
-}
-
-interface ClassSession {
-  department: string;
-  year: string;
-  subject: string;
-  date: string;
-  records: { studentId: string; name: string; present: boolean }[];
-}
-
-function computeAttendance(
-  studentId: string | null,
-): { subjectId: string; percentage: number }[] {
-  if (!studentId) return [];
-  try {
-    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE);
-    const sessions: ClassSession[] = raw ? JSON.parse(raw) : [];
-    const map: Record<string, { present: number; total: number }> = {};
-    for (const session of sessions) {
-      const rec = session.records.find((r) => r.studentId === studentId);
-      if (!rec) continue;
-      if (!map[session.subject])
-        map[session.subject] = { present: 0, total: 0 };
-      map[session.subject].total++;
-      if (rec.present) map[session.subject].present++;
-    }
-    return Object.entries(map).map(([subject, data]) => ({
-      subjectId: subject,
-      percentage:
-        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
-    }));
-  } catch {
-    return [];
-  }
-}
 
 function formatDate(time: bigint): string {
   const ms = Number(time) / 1_000_000;
@@ -124,18 +43,41 @@ function formatAmount(amount: number) {
   }).format(amount);
 }
 
+function computeAttendanceFromSessions(
+  studentId: string | null,
+  sessions: ClassAttendanceSession[],
+): { subjectId: string; percentage: number; present: number; total: number }[] {
+  if (!studentId) return [];
+  const map: Record<string, { present: number; total: number }> = {};
+  for (const session of sessions) {
+    const rec = session.records.find((r) => r.studentId === studentId);
+    if (!rec) continue;
+    if (!map[session.subject]) map[session.subject] = { present: 0, total: 0 };
+    map[session.subject].total++;
+    if (rec.present) map[session.subject].present++;
+  }
+  return Object.entries(map).map(([subject, data]) => ({
+    subjectId: subject,
+    present: data.present,
+    total: data.total,
+    percentage:
+      data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+  }));
+}
+
 export function StudentDashboard() {
   const { isLoggedIn, role, studentId, userName } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { actor } = useActor();
+
+  const [sessions, setSessions] = useState<ClassAttendanceSession[]>([]);
+  const [loadingAttendance, setLoadingAttendance] = useState(true);
 
   const { data: studentRecord } = useStudentRecord(studentId);
   const department = studentRecord?.student?.department ?? "Computer Science";
 
-  seedDemoAttendance();
-  const attendance = computeAttendance(studentId);
-  const loadingAttendance = false;
   const { data: marks, isLoading: loadingMarks } = useMarksByStudent(studentId);
   const { data: exams, isLoading: loadingExams } = useExamTimetable(department);
   const { data: feesDue, isLoading: loadingFees } = useFeesDue(studentId);
@@ -144,15 +86,24 @@ export function StudentDashboard() {
     if (!isLoggedIn || role !== "student") navigate({ to: "/login" });
   }, [isLoggedIn, role, navigate]);
 
+  useEffect(() => {
+    if (!actor || !studentId) return;
+    (actor as any)
+      .getAttendanceSessions()
+      .then(setSessions)
+      .catch(console.error)
+      .finally(() => setLoadingAttendance(false));
+  }, [actor, studentId]);
+
   if (!isLoggedIn || role !== "student") return null;
 
+  const attendance = computeAttendanceFromSessions(studentId, sessions);
+
   const overallAttendance =
-    attendance && attendance.length > 0
+    attendance.length > 0
       ? Math.round(
-          attendance.reduce(
-            (acc: number, a: Attendance) => acc + a.percentage,
-            0,
-          ) / attendance.length,
+          attendance.reduce((acc, a) => acc + a.percentage, 0) /
+            attendance.length,
         )
       : 0;
 
@@ -245,7 +196,7 @@ export function StudentDashboard() {
                   </div>
                 ))}
               </div>
-            ) : !attendance?.length ? (
+            ) : !attendance.length ? (
               <div
                 className="glass rounded-2xl p-12 text-center"
                 data-ocid="student.attendance.empty_state"
@@ -260,13 +211,15 @@ export function StudentDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {attendance.map((a: Attendance, i: number) => {
+                {attendance.map((a, i) => {
                   const pct = Math.round(a.percentage);
                   const isLow = pct < 75;
                   return (
                     <div
                       key={`${a.subjectId}-${i}`}
-                      className={`glass p-4 flex flex-col sm:flex-row sm:items-center gap-3 ${isLow ? "border border-amber-500/30" : ""}`}
+                      className={`glass p-4 flex flex-col sm:flex-row sm:items-center gap-3 ${
+                        isLow ? "border border-amber-500/30" : ""
+                      }`}
                       data-ocid={`student.attendance.item.${i + 1}`}
                     >
                       <div className="sm:w-48 flex-shrink-0 flex items-center gap-2">
@@ -283,10 +236,14 @@ export function StudentDashboard() {
                       <div className="flex-1 flex items-center gap-3">
                         <Progress
                           value={pct}
-                          className={`h-2 flex-1 ${isLow ? "bg-amber-500/10" : "bg-foreground/10"}`}
+                          className={`h-2 flex-1 ${
+                            isLow ? "bg-amber-500/10" : "bg-foreground/10"
+                          }`}
                         />
                         <span
-                          className={`text-sm font-bold w-10 text-right ${isLow ? "text-amber-400" : "text-foreground"}`}
+                          className={`text-sm font-bold w-10 text-right ${
+                            isLow ? "text-amber-400" : "text-foreground"
+                          }`}
                         >
                           {pct}%
                         </span>

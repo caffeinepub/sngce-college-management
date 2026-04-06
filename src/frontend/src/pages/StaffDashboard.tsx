@@ -1,31 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Calendar,
-  Plus,
-  Save,
-  Search,
-  ShieldCheck,
-  UserCircle,
-} from "lucide-react";
+import { Calendar, Plus, Save, Search, ShieldCheck } from "lucide-react";
 import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type { ClassAttendanceSession } from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-
-function loadLS<T>(key: string, def: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : def;
-  } catch {
-    return def;
-  }
-}
-
-function saveLS<T>(key: string, val: T) {
-  localStorage.setItem(key, JSON.stringify(val));
-}
+import { useActor } from "../hooks/useActor";
 
 type StaffTab = "overview" | "classAttendance";
 
@@ -120,43 +102,6 @@ export function StaffDashboard() {
   );
 }
 
-const LS_CLASS_ATTENDANCE_STAFF = "sngce_class_attendance";
-
-interface StaffClassSession {
-  department: string;
-  year: string;
-  subject: string;
-  date: string;
-  records: { studentId: string; name: string; present: boolean }[];
-}
-
-function computeStudentAttendance(
-  studentId: string,
-): { subject: string; present: number; total: number; percentage: number }[] {
-  try {
-    const raw = localStorage.getItem(LS_CLASS_ATTENDANCE_STAFF);
-    const sessions: StaffClassSession[] = raw ? JSON.parse(raw) : [];
-    const map: Record<string, { present: number; total: number }> = {};
-    for (const session of sessions) {
-      const rec = session.records.find((r) => r.studentId === studentId);
-      if (!rec) continue;
-      if (!map[session.subject])
-        map[session.subject] = { present: 0, total: 0 };
-      map[session.subject].total++;
-      if (rec.present) map[session.subject].present++;
-    }
-    return Object.entries(map).map(([subject, data]) => ({
-      subject,
-      present: data.present,
-      total: data.total,
-      percentage:
-        data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
-    }));
-  } catch {
-    return [];
-  }
-}
-
 const DEMO_OVERVIEW_STUDENTS = [
   {
     studentId: "CSE23001",
@@ -178,8 +123,41 @@ const DEMO_OVERVIEW_STUDENTS = [
   },
 ];
 
+function computeStudentAttendanceFromSessions(
+  studentId: string,
+  sessions: ClassAttendanceSession[],
+): { subject: string; present: number; total: number; percentage: number }[] {
+  const map: Record<string, { present: number; total: number }> = {};
+  for (const session of sessions) {
+    const rec = session.records.find((r) => r.studentId === studentId);
+    if (!rec) continue;
+    if (!map[session.subject]) map[session.subject] = { present: 0, total: 0 };
+    map[session.subject].total++;
+    if (rec.present) map[session.subject].present++;
+  }
+  return Object.entries(map).map(([subject, data]) => ({
+    subject,
+    present: data.present,
+    total: data.total,
+    percentage:
+      data.total > 0 ? Math.round((data.present / data.total) * 100) : 0,
+  }));
+}
+
 function OverviewTab() {
+  const { actor } = useActor();
   const [selected, setSelected] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<ClassAttendanceSession[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!actor) return;
+    (actor as any)
+      .getAttendanceSessions()
+      .then(setSessions)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [actor]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -190,90 +168,113 @@ function OverviewTab() {
         <p className="text-muted-foreground text-xs mb-4">
           Demo class for attendance tracking
         </p>
-        <div className="flex flex-col gap-3">
-          {DEMO_OVERVIEW_STUDENTS.map((stu) => {
-            const attendance = computeStudentAttendance(stu.studentId);
-            const overall =
-              attendance.length > 0
-                ? Math.round(
-                    attendance.reduce((a, b) => a + b.percentage, 0) /
-                      attendance.length,
-                  )
-                : null;
-            const isOpen = selected === stu.studentId;
-            return (
-              <div
-                key={stu.studentId}
-                className="glass-sm rounded-xl overflow-hidden"
-              >
-                <button
-                  type="button"
-                  onClick={() => setSelected(isOpen ? null : stu.studentId)}
-                  data-ocid={`staff.overview.item.${DEMO_OVERVIEW_STUDENTS.indexOf(stu) + 1}`}
-                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-foreground/5 transition-colors text-left"
-                >
-                  <div className="glass w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-display font-bold text-sm text-foreground">
-                    {stu.name
-                      .split(" ")
-                      .map((w) => w[0])
-                      .slice(0, 2)
-                      .join("")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground text-sm">
-                      {stu.name}
-                    </p>
-                    <p className="text-muted-foreground text-xs font-mono">
-                      {stu.studentId} · {stu.department} {stu.year}
-                    </p>
-                  </div>
-                  {overall !== null ? (
-                    <span
-                      className={`text-sm font-bold ${overall >= 75 ? "text-green-400" : "text-amber-400"}`}
-                    >
-                      {overall}%
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground text-xs">
-                      No data
-                    </span>
-                  )}
-                </button>
-                {isOpen && (
-                  <div className="px-4 pb-4 border-t border-white/10">
-                    {attendance.length === 0 ? (
-                      <p className="text-muted-foreground text-sm py-3 text-center">
-                        No attendance recorded yet. Use Class Attendance tab to
-                        mark attendance.
-                      </p>
-                    ) : (
-                      <div className="flex flex-col gap-2 mt-3">
-                        {attendance.map((a) => (
-                          <div
-                            key={a.subject}
-                            className="flex items-center gap-3"
-                          >
-                            <span className="text-sm text-foreground flex-1 min-w-0 truncate">
-                              {a.subject}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {a.present}/{a.total}
-                            </span>
-                            <span
-                              className={`text-sm font-bold w-10 text-right ${a.percentage >= 75 ? "text-green-400" : "text-amber-400"}`}
-                            >
-                              {a.percentage}%
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+        {loading ? (
+          <div
+            className="flex flex-col gap-3"
+            data-ocid="staff.overview.loading_state"
+          >
+            {[1, 2, 3].map((k) => (
+              <div key={k} className="glass-sm rounded-xl p-4">
+                <Skeleton className="h-5 w-40 mb-2 bg-foreground/10" />
+                <Skeleton className="h-4 w-28 bg-foreground/10" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {DEMO_OVERVIEW_STUDENTS.map((stu) => {
+              const attendance = computeStudentAttendanceFromSessions(
+                stu.studentId,
+                sessions,
+              );
+              const overall =
+                attendance.length > 0
+                  ? Math.round(
+                      attendance.reduce((a, b) => a + b.percentage, 0) /
+                        attendance.length,
+                    )
+                  : null;
+              const isOpen = selected === stu.studentId;
+              return (
+                <div
+                  key={stu.studentId}
+                  className="glass-sm rounded-xl overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setSelected(isOpen ? null : stu.studentId)}
+                    data-ocid={`staff.overview.item.${DEMO_OVERVIEW_STUDENTS.indexOf(stu) + 1}`}
+                    className="w-full flex items-center gap-4 px-4 py-3 hover:bg-foreground/5 transition-colors text-left"
+                  >
+                    <div className="glass w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-display font-bold text-sm text-foreground">
+                      {stu.name
+                        .split(" ")
+                        .map((w) => w[0])
+                        .slice(0, 2)
+                        .join("")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground text-sm">
+                        {stu.name}
+                      </p>
+                      <p className="text-muted-foreground text-xs font-mono">
+                        {stu.studentId} · {stu.department} {stu.year}
+                      </p>
+                    </div>
+                    {overall !== null ? (
+                      <span
+                        className={`text-sm font-bold ${
+                          overall >= 75 ? "text-green-400" : "text-amber-400"
+                        }`}
+                      >
+                        {overall}%
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">
+                        No data
+                      </span>
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 pb-4 border-t border-white/10">
+                      {attendance.length === 0 ? (
+                        <p className="text-muted-foreground text-sm py-3 text-center">
+                          No attendance recorded yet. Use Class Attendance tab
+                          to mark attendance.
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-2 mt-3">
+                          {attendance.map((a) => (
+                            <div
+                              key={a.subject}
+                              className="flex items-center gap-3"
+                            >
+                              <span className="text-sm text-foreground flex-1 min-w-0 truncate">
+                                {a.subject}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {a.present}/{a.total}
+                              </span>
+                              <span
+                                className={`text-sm font-bold w-10 text-right ${
+                                  a.percentage >= 75
+                                    ? "text-green-400"
+                                    : "text-amber-400"
+                                }`}
+                              >
+                                {a.percentage}%
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -400,12 +401,14 @@ const DEMO_STUDENTS: DemoStudent[] = [
 ];
 
 function ClassAttendanceTab() {
+  const { actor } = useActor();
   const [department, setDepartment] = useState("");
   const [year, setYear] = useState("");
   const [subject, setSubject] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [records, setRecords] = useState<ClassAttendanceRecord[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -440,29 +443,36 @@ function ClassAttendanceTab() {
     );
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    if (!actor) return;
     if (!subject.trim()) {
       toast.error("Please enter a subject name");
       return;
     }
-    const presentCount = records.filter((r) => r.present).length;
-    const absentCount = records.length - presentCount;
-    const existing = loadLS<object[]>(LS_CLASS_ATTENDANCE_STAFF, []);
-    saveLS(LS_CLASS_ATTENDANCE_STAFF, [
-      ...existing,
-      {
+    setSaving(true);
+    try {
+      const session: ClassAttendanceSession = {
+        id: Date.now().toString(),
         department,
         year,
         subject,
         date,
-        records,
         savedAt: new Date().toISOString(),
-      },
-    ]);
-    toast.success(
-      `Attendance saved: ${presentCount} present, ${absentCount} absent for ${department} ${year} - ${subject}`,
-    );
-    setSubmitted(true);
+        records,
+      };
+      await (actor as any).addAttendanceSession(session);
+      const presentCount = records.filter((r) => r.present).length;
+      const absentCount = records.length - presentCount;
+      toast.success(
+        `Attendance saved: ${presentCount} present, ${absentCount} absent for ${department} ${year} - ${subject}`,
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save attendance. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -600,7 +610,11 @@ function ClassAttendanceTab() {
                 {records.map((rec, i) => (
                   <tr
                     key={rec.studentId}
-                    className={`border-b border-white/5 last:border-0 cursor-pointer transition-colors ${rec.present ? "hover:bg-green-500/5" : "hover:bg-red-500/5"}`}
+                    className={`border-b border-white/5 last:border-0 cursor-pointer transition-colors ${
+                      rec.present
+                        ? "hover:bg-green-500/5"
+                        : "hover:bg-red-500/5"
+                    }`}
                     onClick={() => toggleOne(rec.studentId)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ")
@@ -643,10 +657,12 @@ function ClassAttendanceTab() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="glass-btn px-5 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-foreground/10 flex items-center gap-2"
+                disabled={saving}
+                data-ocid="staff.class_attendance.submit_button"
+                className="glass-btn px-5 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-foreground/10 flex items-center gap-2 disabled:opacity-60"
               >
                 <Save size={14} />
-                Save Attendance
+                {saving ? "Saving..." : "Save Attendance"}
               </button>
             ) : (
               <button

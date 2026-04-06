@@ -24,6 +24,7 @@ export function Navbar() {
     { to: "/courses", label: "Courses" },
     { to: "/fees", label: "Fees" },
     { to: "/faculty", label: "Faculty" },
+    { to: "/ktu", label: "KTU" },
     { to: "/placements", label: "Placements" },
     { to: "/admissions", label: "Admissions" },
   ];
