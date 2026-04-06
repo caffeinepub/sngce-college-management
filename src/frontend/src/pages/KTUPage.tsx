@@ -157,296 +157,776 @@ const SCHEMES = [
     name: "2015 Scheme",
     tag: "Legacy",
     tagColor: "bg-amber-500/20 text-amber-300",
-    points: [
-      "For students admitted 2015–2018",
-      "10-point CGPA grading",
-      "75% attendance mandatory",
-      "Credit and semester system",
-    ],
+    desc: "Original B.Tech curriculum. Now in final batches (supplementary only).",
+    sems: "S1 – S8",
+    credits: "160 credits",
+    cgpa: "10-point scale",
   },
   {
     name: "2019 Scheme",
-    tag: "Ongoing",
-    tagColor: "bg-emerald-500/20 text-emerald-300",
-    points: [
-      "For students admitted 2019–2023",
-      "10-point CGPA grading",
-      "75% attendance per subject",
-      "Revised elective and credit structure",
-    ],
+    tag: "Current (Most)",
+    tagColor: "bg-blue-500/20 text-blue-300",
+    desc: "Revised curriculum with updated syllabus. Current batch for most students.",
+    sems: "S1 – S8",
+    credits: "160 credits",
+    cgpa: "10-point scale",
   },
   {
     name: "2024 Scheme",
-    tag: "Latest",
-    tagColor: "bg-blue-500/20 text-blue-300",
-    points: [
-      "For students admitted 2024 onwards",
-      "NEP 2020 aligned curriculum",
-      "75% attendance mandatory",
-      "Enhanced practical and project component",
-    ],
+    tag: "New",
+    tagColor: "bg-emerald-500/20 text-emerald-300",
+    desc: "NEP-aligned new curriculum with Honours/Minor tracks.",
+    sems: "S1 – S8 + Honours/Minor",
+    credits: "170+ credits",
+    cgpa: "10-point scale",
   },
 ];
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Result: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  Timetable: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  Circular: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  Admission: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  Exam: "bg-red-500/20 text-red-300 border-red-500/30",
-};
-
 type TimetableEntry = {
+  id: number;
   sem: string;
   program: string;
   scheme: string;
   type: string;
   examPeriod: string;
   startDate: string;
+  description: string;
   downloadLink: string;
 };
 
 const KTU_TIMETABLES: TimetableEntry[] = [
+  // ==================== 2024 SCHEME ====================
+  // B.Tech 2024 Scheme
   {
+    id: 1,
     sem: "S1",
     program: "B.Tech",
     scheme: "2024",
-    type: "Regular",
+    type: "Regular/Supplementary",
     examPeriod: "Nov–Dec 2025",
     startDate: "15-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description: "B.Tech S1 (R,S) Exam Time Table (2024 scheme) Dec 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 2,
+    sem: "S1",
+    program: "B.Tech",
+    scheme: "2024",
+    type: "Supplementary",
+    examPeriod: "May 2025",
+    startDate: "26-05-2025",
+    description: "B.Tech S1 (S) Examination (2024 scheme) May 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 3,
     sem: "S2",
     program: "B.Tech",
     scheme: "2024",
-    type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "15-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    type: "Regular",
+    examPeriod: "Apr–May 2025",
+    startDate: "05-05-2025",
+    description: "B.Tech S2 (R) Examination (2024 scheme) May 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 4,
+    sem: "S2",
+    program: "B.Tech",
+    scheme: "2024",
+    type: "Supplementary",
+    examPeriod: "Jan 2026",
+    startDate: "05-01-2026",
+    description: "B.Tech S2 (S) Examination January 2026 (2024 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 5,
     sem: "S3",
     program: "B.Tech",
     scheme: "2024",
     type: "Regular",
-    examPeriod: "Nov–Dec 2025",
-    startDate: "12-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    examPeriod: "Nov 2025",
+    startDate: "13-11-2025",
+    description:
+      "B.Tech S3 (R) Examination Time Table November 2025 (2024 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 6,
+    sem: "S3",
+    program: "B.Tech",
+    scheme: "2024",
+    type: "Minor",
+    examPeriod: "Jan 2026",
+    startDate: "20-01-2026",
+    description: "B.Tech S3 (Minor) Examination, Nov 2025 (2024 Admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // ==================== 2019 SCHEME ====================
+  // B.Tech 2019 Scheme - S1
+  {
+    id: 7,
+    sem: "S1",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "Dec 2023",
+    startDate: "19-12-2023",
+    description: "B.Tech S1 (R,S) Examinations (2019 scheme) December 2023",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 8,
+    sem: "S1",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Dec 2025",
+    startDate: "02-12-2025",
+    description:
+      "B.Tech S1 (S,FE) S2 (S,FE) Dec 2025 examination (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S2
+  {
+    id: 9,
+    sem: "S2",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "Jun 2023",
+    startDate: "10-06-2023",
+    description:
+      "B.Tech S2 Regular and Supplementary Examinations June 2023 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 10,
+    sem: "S2",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Part-Time Supplementary",
+    examPeriod: "Dec 2025",
+    startDate: "08-01-2026",
+    description: "B.Tech S2 (PT) (S,FE) Exam Dec 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S3
+  {
+    id: 11,
+    sem: "S3",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "Dec 2023",
+    startDate: "19-12-2023",
+    description: "B.Tech S3 (R,S) Examinations (2019 scheme) December 2023",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 12,
     sem: "S3",
     program: "B.Tech",
     scheme: "2019",
     type: "Supplementary/FE",
     examPeriod: "Nov–Dec 2025",
     startDate: "02-12-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description: "B.Tech S3 (S,FE) Examinations November 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 13,
+    sem: "S3",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Regular",
+    examPeriod: "Apr–May 2025",
+    startDate: "31-05-2025",
+    description: "B.Tech S3 (S,FE) Exam Time Table (2019 Scheme) May 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S4
+  {
+    id: 14,
     sem: "S4",
     program: "B.Tech",
     scheme: "2019",
     type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "20-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    examPeriod: "Jun 2022",
+    startDate: "10-06-2022",
+    description:
+      "B.Tech S4 Regular and Supplementary Examinations June 2022 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 15,
+    sem: "S4",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2024",
+    startDate: "08-01-2024",
+    description: "B.Tech S4 (S,FE) Exam January 2024 (2019 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 16,
+    sem: "S4",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Honours",
+    examPeriod: "May 2025",
+    startDate: "27-05-2025",
+    description: "B.Tech S4 Honours Exam Time Table May 2025 (2023 admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 17,
+    sem: "S4",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Minor",
+    examPeriod: "May 2025",
+    startDate: "29-05-2025",
+    description: "B.Tech S4 Minor Exam Time Table May 2025 (2023 admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S5
+  {
+    id: 18,
     sem: "S5",
     program: "B.Tech",
     scheme: "2019",
     type: "Regular/Supplementary",
     examPeriod: "Nov 2025",
-    startDate: "10-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    startDate: "12-11-2025",
+    description: "B.Tech S5 (R,S) Examinations November 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 19,
+    sem: "S5",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "May 2025",
+    startDate: "22-05-2025",
+    description: "B.Tech S5 (S,FE) Exam Time Table May 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 20,
+    sem: "S5",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Honours",
+    examPeriod: "Jan 2026",
+    startDate: "13-01-2026",
+    description: "B.Tech S5 (Honours) Examinations Nov 2025 (2023 Admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 21,
+    sem: "S5",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Minor",
+    examPeriod: "Jan 2026",
+    startDate: "20-01-2026",
+    description: "B.Tech S5 (Minor) Examination Nov 2025 (2023 Admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S6
+  {
+    id: 22,
     sem: "S6",
     program: "B.Tech",
     scheme: "2019",
     type: "Regular/Supplementary",
     examPeriod: "Apr–May 2026",
     startDate: "22-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description:
+      "B.Tech S6 Regular & Supplementary Examinations April 2026 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 23,
+    sem: "S6",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Dec 2025",
+    startDate: "15-12-2025",
+    description: "B.Tech S6 (S,FE) Exam Time Table (2019 scheme) Dec 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 24,
+    sem: "S6",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Honours",
+    examPeriod: "May 2025",
+    startDate: "27-05-2025",
+    description: "B.Tech S6 Honours Exam Time Table May 2025 (2022 admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 25,
+    sem: "S6",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Minor",
+    examPeriod: "May 2025",
+    startDate: "29-05-2025",
+    description: "B.Tech S6 Minor Exam Time Table May 2025 (2022 admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S7
+  {
+    id: 26,
     sem: "S7",
     program: "B.Tech",
     scheme: "2019",
     type: "Regular/Supplementary",
     examPeriod: "Nov 2025",
     startDate: "14-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description: "B.Tech S7 (R,S) Examinations November 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 27,
+    sem: "S7",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Apr 2025",
+    startDate: "02-04-2025",
+    description: "B.Tech S7 (S,FE) Exam Time Table April 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 28,
+    sem: "S7",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Honours",
+    examPeriod: "Jan 2026",
+    startDate: "13-01-2026",
+    description: "B.Tech S7 (Honours) Examinations Nov 2025 (2022 Admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 29,
+    sem: "S7",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Minor",
+    examPeriod: "Jan 2026",
+    startDate: "20-01-2026",
+    description: "B.Tech S7 (Minor) Examination Nov 2025 (2022 Admission)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // B.Tech 2019 Scheme - S8
+  {
+    id: 30,
+    sem: "S8",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "Apr 2025",
+    startDate: "16-04-2025",
+    description:
+      "Revised B.Tech S8 (R,S) Exam Time Table April 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 31,
+    sem: "S8",
+    program: "B.Tech",
+    scheme: "2019",
+    type: "Supplementary",
+    examPeriod: "Sep 2025",
+    startDate: "24-09-2025",
+    description: "B.Tech S8 (S) Exam September 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // Part-Time B.Tech 2019
+  {
+    id: 32,
+    sem: "S1–S7",
+    program: "B.Tech (Part-Time)",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Aug 2025",
+    startDate: "02-08-2025",
+    description:
+      "Part Time B.Tech S1,S3,S5 (S,FE) Supplementary Exam Time Table May 2025 (2019 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 33,
+    sem: "S2,S4,S6",
+    program: "B.Tech (Part-Time)",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2024",
+    startDate: "08-01-2024",
+    description:
+      "B.Tech Part-Time S2(S), S4(S), S6(S) Examinations (2019 scheme), January 2024",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // ==================== 2015 SCHEME ====================
+  // B.Tech 2015 Scheme - Special/Supplementary
+  {
+    id: 34,
+    sem: "S1–S2",
+    program: "B.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "01-08-2025",
+    description:
+      "B.Tech S1,S2 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 35,
+    sem: "S3",
+    program: "B.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "02-08-2025",
+    description: "B.Tech S3 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 36,
+    sem: "S4",
+    program: "B.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "12-08-2025",
+    description: "B.Tech S4 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 37,
+    sem: "S5",
+    program: "B.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "01-08-2025",
+    description: "B.Tech S5 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 38,
+    sem: "S6",
+    program: "B.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "02-08-2025",
+    description: "B.Tech S6 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 39,
     sem: "S7",
     program: "B.Tech",
     scheme: "2015",
-    type: "Supplementary/FE",
-    examPeriod: "Nov–Dec 2025",
-    startDate: "01-12-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "04-08-2025",
+    description: "B.Tech S7 Special Exam Time Table August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
-    sem: "S8",
-    program: "B.Tech",
-    scheme: "2019",
-    type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "17-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
+    id: 40,
     sem: "S8",
     program: "B.Tech",
     scheme: "2015",
-    type: "Supplementary/FE",
-    examPeriod: "Apr–May 2026",
-    startDate: "25-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    type: "Special Exam",
+    examPeriod: "Aug 2025",
+    startDate: "05-08-2025",
+    description:
+      "B.Tech S8 Special Examination August 2025 (2015 scheme) incl. Part-Time",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 41,
+    sem: "S1–S7 (PT)",
+    program: "B.Tech (Part-Time)",
+    scheme: "2015",
+    type: "Supplementary",
+    examPeriod: "Aug 2025",
+    startDate: "02-08-2025",
+    description:
+      "B.Tech S1–S7 Part-Time (S,FE) Exam Time August 2025 (2015 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // ==================== M.TECH ====================
+  {
+    id: 42,
     sem: "S1",
     program: "M.Tech",
     scheme: "2024",
-    type: "Regular",
+    type: "Regular/Supplementary",
     examPeriod: "Dec 2025",
-    startDate: "10-12-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    startDate: "29-12-2025",
+    description: "M.Tech S1 (R,S) Exam Time Table December 2025 (2022 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 43,
     sem: "S2",
     program: "M.Tech",
     scheme: "2024",
     type: "Regular/Supplementary",
-    examPeriod: "May 2026",
-    startDate: "05-05-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    examPeriod: "May–Aug 2025",
+    startDate: "31-07-2025",
+    description: "M.Tech S2 (R,S) Exam Time Table May 2025 (2022 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
-    sem: "S1",
+    id: 44,
+    sem: "S2",
     program: "M.Tech",
     scheme: "2019",
     type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "14-01-2026",
+    description: "M.Tech S2 (S,FE) Examinations Jan 2026 (2022 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 45,
+    sem: "S1",
+    program: "M.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Sep 2025",
+    startDate: "10-09-2025",
+    description:
+      "M.Tech S1 (Special Exam) August 2025 (2015 Scheme) incl. Part-Time",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 46,
+    sem: "S3",
+    program: "M.Tech",
+    scheme: "2015",
+    type: "Special Exam",
+    examPeriod: "Sep 2025",
+    startDate: "20-09-2025",
+    description:
+      "M.Tech S3 (Special Exam) August 2025 (2015 Scheme) incl. Part-Time",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // ==================== MBA ====================
+  {
+    id: 47,
+    sem: "S1",
+    program: "MBA",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "May–Jun 2025",
+    startDate: "26-05-2025",
+    description: "MBA S1 (S,FE) & MBA S2 (R,S) Examination May/June 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 48,
+    sem: "S2",
+    program: "MBA",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "May–Jun 2025",
+    startDate: "26-05-2025",
+    description: "MBA S2 (R,S) Examination May/June 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 49,
+    sem: "S2",
+    program: "MBA",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "03-01-2026",
+    description: "MBA S2 (S,FE) JAN 2026 (2020 SCHEME)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 50,
+    sem: "S3",
+    program: "MBA",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "May–Jun 2025",
+    startDate: "27-05-2025",
+    description: "MBA S3 (S,FE) Incl. PT Exam Time Table May/June 2025",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 51,
+    sem: "S4",
+    program: "MBA",
+    scheme: "2019",
+    type: "Regular/Supplementary",
+    examPeriod: "Apr–May 2025",
+    startDate: "21-04-2025",
+    description: "MBA S4 (R,S) April/May 2025 Including MBA S4 (PT) (S,FE)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 52,
+    sem: "S4",
+    program: "MBA",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "17-01-2026",
+    description: "MBA S4 (S,FE) Incl PT Examination Jan 2026 (2020 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  // ==================== MCA ====================
+  {
+    id: 53,
+    sem: "S1–S2",
+    program: "MCA",
+    scheme: "2019",
+    type: "Regular/Supplementary",
     examPeriod: "Dec 2025",
     startDate: "15-12-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description: "MCA 2 Year S1 (R,S) Exam Time Table Dec 2025 (2020 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
+    id: 54,
     sem: "S2",
-    program: "M.Tech",
-    scheme: "2019",
-    type: "Supplementary/FE",
-    examPeriod: "May 2026",
-    startDate: "08-05-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S1",
-    program: "MBA",
-    scheme: "2019",
-    type: "Supplementary/FE",
-    examPeriod: "Nov–Dec 2025",
-    startDate: "20-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S2",
-    program: "MBA",
-    scheme: "2019",
-    type: "Regular/Supplementary",
-    examPeriod: "Apr 2026",
-    startDate: "10-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S3",
-    program: "MBA",
-    scheme: "2019",
-    type: "Regular",
-    examPeriod: "Nov 2025",
-    startDate: "11-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S4",
-    program: "MBA",
-    scheme: "2019",
-    type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "16-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S1",
     program: "MCA",
     scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "05-01-2026",
+    description: "MCA 2 Year S2 (S,FE) Exam Dec 2025 (2020 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 55,
+    sem: "S3–S9 (Int.)",
+    program: "MCA (Integrated)",
+    scheme: "2019",
     type: "Regular/Supplementary",
-    examPeriod: "Nov–Dec 2025",
+    examPeriod: "Nov 2025",
     startDate: "18-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    description:
+      "MCA Integrated S3(R,S), S5(R,S), S7(R,S) & S9(R,S) examination Nov 2025 (2020 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
   {
-    sem: "S2",
-    program: "MCA",
+    id: 56,
+    sem: "S4,S8 (Int.)",
+    program: "MCA (Integrated)",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "09-01-2026",
+    description: "MCA Integrated S4 (S,FE) Dec 2025 (2020 scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 57,
+    sem: "S8",
+    program: "MCA (Integrated)",
+    scheme: "2019",
+    type: "Supplementary/FE",
+    examPeriod: "Jan 2026",
+    startDate: "02-02-2026",
+    description:
+      "Revised Detailed Time Table MCA Integrated S8 (S,FE) examination Jan 2026 (2020 Scheme)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
+  },
+  {
+    id: 58,
+    sem: "All",
+    program: "MCA (Integrated)",
     scheme: "2019",
     type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "14-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S3",
-    program: "MCA",
-    scheme: "2019",
-    type: "Regular",
-    examPeriod: "Nov 2025",
-    startDate: "13-11-2025",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
-  },
-  {
-    sem: "S4",
-    program: "MCA",
-    scheme: "2019",
-    type: "Regular/Supplementary",
-    examPeriod: "Apr–May 2026",
-    startDate: "19-04-2026",
-    downloadLink: "https://ktu.edu.in/exam/timetable",
+    examPeriod: "May–Jun 2025",
+    startDate: "04-06-2025",
+    description:
+      "MCA Integrated exam time table (2020 Scheme) May/June 2025 – Even (R,S)/Odd (S,FE)",
+    downloadLink: "https://app.ktu.edu.in/eu/pub/examtimetable.htm",
   },
 ];
 
-const PROGRAMS = ["All", "B.Tech", "M.Tech", "MBA", "MCA"];
+const PROGRAMS = [
+  "All",
+  "B.Tech",
+  "B.Tech (Part-Time)",
+  "M.Tech",
+  "MBA",
+  "MCA",
+  "MCA (Integrated)",
+];
 const SEMESTERS = ["All", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
 const SCHEME_FILTERS = ["All", "2015", "2019", "2024"];
+const EXAM_TYPE_FILTERS = [
+  "All",
+  "Regular",
+  "Supplementary",
+  "Special",
+  "Honours",
+  "Minor",
+  "Part-Time",
+];
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-export function KTUPage() {
+export default function KTUPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [lastUpdated, setLastUpdated] = useState(() => new Date());
   const [filterProgram, setFilterProgram] = useState("All");
   const [filterSem, setFilterSem] = useState("All");
   const [filterScheme, setFilterScheme] = useState("All");
-
-  const handleRefresh = () => {
-    setLastUpdated(new Date());
-  };
+  const [filterType, setFilterType] = useState("All");
+  const [notifCount, setNotifCount] = useState(10);
 
   const filteredTimetables = KTU_TIMETABLES.filter((t) => {
     const matchProgram = filterProgram === "All" || t.program === filterProgram;
-    const matchSem = filterSem === "All" || t.sem === filterSem;
+    const matchSem =
+      filterSem === "All" ||
+      t.sem.includes(filterSem.replace("S", "")) ||
+      t.sem === filterSem;
     const matchScheme = filterScheme === "All" || t.scheme === filterScheme;
-    return matchProgram && matchSem && matchScheme;
+    const matchType =
+      filterType === "All" ||
+      (filterType === "Regular" && t.type.includes("Regular")) ||
+      (filterType === "Supplementary" &&
+        (t.type.includes("Supplementary") || t.type.includes("FE"))) ||
+      (filterType === "Special" && t.type.includes("Special")) ||
+      (filterType === "Honours" && t.type.includes("Honours")) ||
+      (filterType === "Minor" && t.type.includes("Minor")) ||
+      (filterType === "Part-Time" && t.type.includes("Part-Time"));
+    return matchProgram && matchSem && matchScheme && matchType;
   });
+
+  const handleDownload = (entry: TimetableEntry) => {
+    const url = entry.downloadLink;
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -554,37 +1034,36 @@ export function KTUPage() {
                   Semester Exam Timetable
                 </h2>
               </div>
-              <p className="text-muted-foreground text-sm mb-4">
-                Official KTU exam timetables for all programmes and semesters.
-                Click{" "}
-                <span className="font-medium text-foreground">
-                  Download Timetable
-                </span>{" "}
-                to get the latest PDF directly from ktu.edu.in.
+              <p className="text-muted-foreground text-sm mb-1">
+                All semester and supplementary exam timetables for B.Tech,
+                M.Tech, MBA and MCA — 2015, 2019 and 2024 schemes.
               </p>
-
-              <div className="glass-sm rounded-xl px-3 py-2 mb-5 flex items-center gap-2">
-                <ExternalLink
-                  size={12}
-                  className="text-blue-400 flex-shrink-0"
+              <div className="glass-sm rounded-xl px-3 py-2 mb-5 flex items-start gap-2">
+                <Download
+                  size={13}
+                  className="text-blue-400 flex-shrink-0 mt-0.5"
                 />
                 <p className="text-muted-foreground text-xs">
-                  All timetable PDFs are hosted on the official KTU portal.{" "}
+                  Click{" "}
+                  <span className="font-semibold text-foreground">
+                    Download Timetable
+                  </span>{" "}
+                  to open the official KTU exam timetable portal at{" "}
                   <a
-                    href="https://ktu.edu.in/exam/timetable"
+                    href="https://app.ktu.edu.in/eu/pub/examtimetable.htm"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground underline underline-offset-2 font-medium"
+                    className="text-foreground underline underline-offset-2"
                   >
-                    ktu.edu.in/exam/timetable
+                    app.ktu.edu.in
                   </a>{" "}
-                  — updated in real time by KTU.
+                  where you can download the exact PDF for any exam directly.
                 </p>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <div className="flex items-center gap-1.5 mr-2">
+              {/* Filters Row 1 - Programme */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex items-center gap-1.5 mr-1">
                   <Filter size={12} className="text-muted-foreground" />
                   <span className="text-muted-foreground text-xs font-medium">
                     Programme:
@@ -595,7 +1074,6 @@ export function KTUPage() {
                     key={p}
                     type="button"
                     onClick={() => setFilterProgram(p)}
-                    data-ocid="ktu.tab"
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                       filterProgram === p
                         ? "bg-foreground/20 text-foreground border border-foreground/30"
@@ -606,8 +1084,10 @@ export function KTUPage() {
                   </button>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <div className="flex items-center gap-1.5 mr-2">
+
+              {/* Filters Row 2 - Semester */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex items-center gap-1.5 mr-1">
                   <Filter size={12} className="text-muted-foreground" />
                   <span className="text-muted-foreground text-xs font-medium">
                     Semester:
@@ -618,7 +1098,6 @@ export function KTUPage() {
                     key={s}
                     type="button"
                     onClick={() => setFilterSem(s)}
-                    data-ocid="ktu.tab"
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                       filterSem === s
                         ? "bg-foreground/20 text-foreground border border-foreground/30"
@@ -629,182 +1108,194 @@ export function KTUPage() {
                   </button>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 mb-5">
-                <div className="flex items-center gap-1.5 mr-2">
+
+              {/* Filters Row 3 - Scheme */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex items-center gap-1.5 mr-1">
                   <Filter size={12} className="text-muted-foreground" />
                   <span className="text-muted-foreground text-xs font-medium">
                     Scheme:
                   </span>
                 </div>
-                {SCHEME_FILTERS.map((sc) => (
+                {SCHEME_FILTERS.map((s) => (
                   <button
-                    key={sc}
+                    key={s}
                     type="button"
-                    onClick={() => setFilterScheme(sc)}
-                    data-ocid="ktu.tab"
+                    onClick={() => setFilterScheme(s)}
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                      filterScheme === sc
+                      filterScheme === s
                         ? "bg-foreground/20 text-foreground border border-foreground/30"
                         : "glass-sm text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {sc === "All" ? "All Schemes" : `${sc} Scheme`}
+                    {s}
                   </button>
                 ))}
               </div>
 
-              {/* Timetable Cards */}
+              {/* Filters Row 4 - Type */}
+              <div className="flex flex-wrap gap-2 mb-5">
+                <div className="flex items-center gap-1.5 mr-1">
+                  <Filter size={12} className="text-muted-foreground" />
+                  <span className="text-muted-foreground text-xs font-medium">
+                    Exam Type:
+                  </span>
+                </div>
+                {EXAM_TYPE_FILTERS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFilterType(t)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                      filterType === t
+                        ? "bg-foreground/20 text-foreground border border-foreground/30"
+                        : "glass-sm text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+
+              {/* Timetable count */}
+              <p className="text-muted-foreground text-xs mb-3">
+                Showing{" "}
+                <span className="font-semibold text-foreground">
+                  {filteredTimetables.length}
+                </span>{" "}
+                timetable{filteredTimetables.length !== 1 ? "s" : ""}
+              </p>
+
+              {/* Timetable list */}
               {filteredTimetables.length === 0 ? (
-                <div
-                  className="glass-sm rounded-xl p-6 text-center"
-                  data-ocid="ktu.empty_state"
-                >
+                <div className="glass-sm rounded-xl p-8 text-center">
                   <p className="text-muted-foreground text-sm">
                     No timetables found for the selected filters.
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {filteredTimetables.map((t, idx) => (
+                <div className="space-y-2">
+                  {filteredTimetables.map((entry) => (
                     <div
-                      key={t.program + t.sem + t.scheme + t.examPeriod + t.type}
-                      data-ocid={`ktu.item.${idx + 1}`}
-                      className="glass-sm rounded-xl p-4 flex flex-col gap-2"
+                      key={entry.id}
+                      className="glass-sm rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="glass px-2 py-0.5 rounded-full text-xs font-bold text-foreground">
-                            {t.program} {t.sem}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                          <span className="font-semibold text-foreground text-sm">
+                            {entry.program} {entry.sem}
                           </span>
-                          <span className="text-muted-foreground text-xs bg-white/5 px-2 py-0.5 rounded-full">
-                            {t.scheme} Scheme
-                          </span>
+                          <Badge
+                            className={`text-[10px] px-1.5 py-0 ${
+                              entry.scheme === "2024"
+                                ? "bg-emerald-500/20 text-emerald-300 border-0"
+                                : entry.scheme === "2019"
+                                  ? "bg-blue-500/20 text-blue-300 border-0"
+                                  : "bg-amber-500/20 text-amber-300 border-0"
+                            }`}
+                          >
+                            {entry.scheme} Scheme
+                          </Badge>
+                          <Badge
+                            className={`text-[10px] px-1.5 py-0 ${
+                              entry.type.includes("Regular")
+                                ? "bg-purple-500/20 text-purple-300 border-0"
+                                : entry.type.includes("Special")
+                                  ? "bg-orange-500/20 text-orange-300 border-0"
+                                  : entry.type.includes("Honours")
+                                    ? "bg-pink-500/20 text-pink-300 border-0"
+                                    : entry.type.includes("Minor")
+                                      ? "bg-indigo-500/20 text-indigo-300 border-0"
+                                      : "bg-red-500/20 text-red-300 border-0"
+                            }`}
+                          >
+                            {entry.type}
+                          </Badge>
                         </div>
+                        <p className="text-muted-foreground text-xs leading-snug">
+                          {entry.description}
+                        </p>
+                        <p className="text-muted-foreground text-[10px] mt-0.5">
+                          Exam Period:{" "}
+                          <span className="text-foreground/70">
+                            {entry.examPeriod}
+                          </span>
+                          {" · "}
+                          Starts:{" "}
+                          <span className="text-foreground/70">
+                            {entry.startDate}
+                          </span>
+                        </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs w-20">
-                          Type
-                        </span>
-                        <span className="text-foreground text-xs">
-                          {t.type}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs w-20">
-                          Exam Period
-                        </span>
-                        <span className="text-foreground text-xs font-medium">
-                          {t.examPeriod}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs w-20">
-                          Starts
-                        </span>
-                        <span className="text-foreground text-xs">
-                          {t.startDate}
-                        </span>
-                      </div>
-                      <a
-                        href={t.downloadLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-ocid="ktu.button"
-                        className="mt-1 glass-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-foreground w-full"
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(entry)}
+                        className="glass-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-foreground whitespace-nowrap"
                       >
                         <Download size={12} />
-                        Download Timetable (ktu.edu.in)
-                      </a>
+                        Download Timetable
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
-
-              <div className="mt-5 flex justify-center">
-                <a
-                  href="https://ktu.edu.in/exam/timetable"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground"
-                >
-                  <ExternalLink size={14} />
-                  View All Timetables on ktu.edu.in
-                </a>
-              </div>
             </div>
           </section>
 
-          {/* Live Notifications */}
+          {/* NOTIFICATIONS */}
           <section>
             <div className="glass rounded-2xl p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Bell size={18} className="text-foreground/70" />
                   <h2 className="font-display font-bold text-xl text-foreground">
-                    KTU Live Notifications
+                    Live Notifications
                   </h2>
                 </div>
                 <button
                   type="button"
-                  onClick={handleRefresh}
-                  data-ocid="ktu.button"
-                  className="glass-btn flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => setNotifCount((n) => (n === 10 ? 5 : 10))}
+                  className="glass-btn flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-foreground"
                 >
-                  <RefreshCw size={12} />
+                  <RefreshCw size={11} />
                   Refresh
                 </button>
               </div>
-              <p className="text-muted-foreground text-xs mb-1">
-                Last updated:{" "}
-                {lastUpdated.toLocaleTimeString("en-IN", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
-              </p>
-              <div className="glass-sm rounded-xl px-3 py-2 mb-4 flex items-center gap-2">
-                <ExternalLink
-                  size={12}
-                  className="text-muted-foreground flex-shrink-0"
-                />
-                <p className="text-muted-foreground text-xs">
-                  Visit{" "}
+              <div className="space-y-2">
+                {KTU_NOTIFICATIONS.slice(0, notifCount).map((n) => (
                   <a
-                    href="https://ktu.edu.in"
+                    key={n.id}
+                    href={n.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground underline underline-offset-2"
+                    className="glass-sm rounded-xl p-3 flex items-start gap-3 hover:bg-white/5 transition-colors block"
                   >
-                    ktu.edu.in
-                  </a>{" "}
-                  for the latest real-time updates
-                </p>
-              </div>
-              <div className="divide-y divide-white/5">
-                {KTU_NOTIFICATIONS.map((notif) => (
-                  <a
-                    key={notif.id}
-                    href={notif.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start gap-3 py-3 group hover:bg-white/5 rounded-lg px-2 -mx-2 transition-colors"
-                  >
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold border whitespace-nowrap mt-0.5 ${CATEGORY_COLORS[notif.category]}`}
+                    <Badge
+                      className={`text-[10px] px-2 py-0.5 flex-shrink-0 mt-0.5 border-0 ${
+                        n.category === "Result"
+                          ? "bg-emerald-500/20 text-emerald-300"
+                          : n.category === "Timetable"
+                            ? "bg-blue-500/20 text-blue-300"
+                            : n.category === "Exam"
+                              ? "bg-purple-500/20 text-purple-300"
+                              : n.category === "Admission"
+                                ? "bg-pink-500/20 text-pink-300"
+                                : "bg-amber-500/20 text-amber-300"
+                      }`}
                     >
-                      {notif.category}
-                    </span>
+                      {n.category}
+                    </Badge>
                     <div className="flex-1 min-w-0">
-                      <p className="text-foreground text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2">
-                        {notif.title}
+                      <p className="text-foreground text-sm leading-snug">
+                        {n.title}
                       </p>
-                      <p className="text-muted-foreground text-xs mt-0.5">
-                        {formatDate(notif.date)}
+                      <p className="text-muted-foreground text-[10px] mt-0.5">
+                        {n.date}
                       </p>
                     </div>
                     <ExternalLink
                       size={12}
-                      className="text-muted-foreground group-hover:text-foreground mt-1 flex-shrink-0"
+                      className="text-muted-foreground flex-shrink-0 mt-1"
                     />
                   </a>
                 ))}
@@ -812,119 +1303,72 @@ export function KTUPage() {
             </div>
           </section>
 
-          {/* Exam Details */}
+          {/* EXAM DETAILS */}
           <section>
             <div className="glass rounded-2xl p-6 sm:p-8">
-              <h2 className="font-display font-bold text-xl text-foreground mb-5">
-                KTU Examination Details
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                {EXAM_TYPES.map((exam) => {
-                  const Icon = exam.icon;
-                  return (
-                    <div key={exam.title} className="glass-sm rounded-xl p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="glass w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Icon size={15} className="text-foreground/70" />
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar size={18} className="text-foreground/70" />
+                <h2 className="font-display font-bold text-xl text-foreground">
+                  Exam Details
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {EXAM_TYPES.map((e) => (
+                  <div key={e.title} className="glass-sm rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <e.icon size={15} className="text-foreground/70" />
+                      <h3 className="font-semibold text-foreground text-sm">
+                        {e.title}
+                      </h3>
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        { label: "Schedule", value: e.schedule },
+                        { label: "Duration", value: e.duration },
+                        { label: "Pattern", value: e.pattern },
+                        { label: "Note", value: e.note },
+                      ].map((item) => (
+                        <div key={item.label} className="flex gap-2">
+                          <span className="text-muted-foreground text-xs w-16 flex-shrink-0">
+                            {item.label}:
+                          </span>
+                          <span className="text-foreground text-xs">
+                            {item.value}
+                          </span>
                         </div>
-                        <h3 className="font-semibold text-foreground text-sm leading-tight">
-                          {exam.title}
-                        </h3>
-                      </div>
-                      <div className="space-y-1.5">
-                        {[
-                          ["Schedule", exam.schedule],
-                          ["Duration", exam.duration],
-                          ["Pattern", exam.pattern],
-                          ["Note", exam.note],
-                        ].map(([label, val]) => (
-                          <div key={label} className="flex items-center gap-2">
-                            <span className="text-muted-foreground text-xs w-20 flex-shrink-0">
-                              {label}
-                            </span>
-                            <span className="text-foreground text-xs">
-                              {val}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-              <div className="glass-sm rounded-xl p-4 mb-4">
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2
-                    size={15}
-                    className="text-blue-400 mt-0.5 flex-shrink-0"
-                  />
-                  <div>
-                    <p className="text-foreground text-sm font-semibold mb-0.5">
-                      Hall Ticket Download
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Hall tickets are available on the KTU portal{" "}
-                      <span className="font-medium text-foreground">
-                        7–10 days before the exam
-                      </span>
-                      . Students must download and verify before the exam.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <a
-                href="https://ktu.edu.in/exam/hallticket"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground"
-              >
-                <ExternalLink size={14} />
-                Download Hall Ticket
-              </a>
-            </div>
-          </section>
-
-          {/* Results */}
-          <section>
-            <div className="glass rounded-2xl p-6 sm:p-8">
-              <h2 className="font-display font-bold text-xl text-foreground mb-2">
-                KTU Results
-              </h2>
-              <p className="text-muted-foreground text-sm mb-5">
-                Results are published on the official KTU portal. Check using
-                your KTU ID and register number.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 mb-5">
-                {RESULT_STEPS.map((step, i) => (
-                  <div
-                    key={step}
-                    className="glass-sm rounded-xl p-3 flex flex-col items-center text-center gap-2"
-                  >
-                    <div className="w-7 h-7 rounded-full bg-foreground/10 flex items-center justify-center">
-                      <span className="text-foreground font-bold text-xs">
-                        {i + 1}
-                      </span>
-                    </div>
-                    <p className="text-foreground text-xs leading-snug">
-                      {step}
-                    </p>
                   </div>
                 ))}
               </div>
-              <div className="glass-sm rounded-xl p-3 mb-5 flex items-start gap-2.5">
-                <Bell
-                  size={14}
-                  className="text-amber-400 mt-0.5 flex-shrink-0"
-                />
-                <p className="text-muted-foreground text-xs">
-                  <span className="font-semibold text-foreground">
-                    Revaluation / Scrutiny:
-                  </span>{" "}
-                  Applications within{" "}
-                  <span className="text-foreground font-medium">15 days</span>{" "}
-                  of result publication on ktu.edu.in.
-                </p>
+            </div>
+          </section>
+
+          {/* RESULTS */}
+          <section>
+            <div className="glass rounded-2xl p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle2 size={18} className="text-foreground/70" />
+                <h2 className="font-display font-bold text-xl text-foreground">
+                  Results
+                </h2>
               </div>
+              <p className="text-muted-foreground text-sm mb-4">
+                How to check your KTU exam results:
+              </p>
+              <ol className="space-y-2 mb-5">
+                {RESULT_STEPS.map((step, i) => (
+                  <li
+                    key={step}
+                    className="glass-sm rounded-xl p-3 flex items-center gap-3"
+                  >
+                    <span className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-bold text-foreground flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-foreground text-sm">{step}</span>
+                  </li>
+                ))}
+              </ol>
               <a
                 href="https://ktu.edu.in/exam/result"
                 target="_blank"
@@ -932,45 +1376,102 @@ export function KTUPage() {
                 className="glass-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground"
               >
                 <ExternalLink size={14} />
-                Check Results Now
+                Check Results on KTU Portal
               </a>
             </div>
           </section>
 
-          {/* Academic Calendar */}
+          {/* ACADEMIC CALENDAR */}
           <section>
             <div className="glass rounded-2xl p-6 sm:p-8">
-              <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center gap-2 mb-4">
                 <Calendar size={18} className="text-foreground/70" />
                 <h2 className="font-display font-bold text-xl text-foreground">
-                  Academic Calendar 2025-26
+                  Academic Calendar 2025–26
                 </h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[
-                  { label: "Odd Semester", rows: ODD_SEMESTER },
-                  { label: "Even Semester", rows: EVEN_SEMESTER },
-                ].map(({ label, rows }) => (
-                  <div key={label}>
-                    <h3 className="font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
-                      <span className="glass-sm px-2 py-0.5 rounded-full text-xs">
-                        {label}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <h3 className="font-semibold text-foreground text-sm mb-3">
+                    Odd Semester (Jul–Dec)
+                  </h3>
+                  <div className="space-y-2">
+                    {ODD_SEMESTER.map((item) => (
+                      <div
+                        key={item.event}
+                        className="glass-sm rounded-xl p-3 flex justify-between items-center"
+                      >
+                        <span className="text-muted-foreground text-sm">
+                          {item.event}
+                        </span>
+                        <span className="font-medium text-foreground text-sm">
+                          {item.date}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground text-sm mb-3">
+                    Even Semester (Jan–Jun)
+                  </h3>
+                  <div className="space-y-2">
+                    {EVEN_SEMESTER.map((item) => (
+                      <div
+                        key={item.event}
+                        className="glass-sm rounded-xl p-3 flex justify-between items-center"
+                      >
+                        <span className="text-muted-foreground text-sm">
+                          {item.event}
+                        </span>
+                        <span className="font-medium text-foreground text-sm">
+                          {item.date}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* REGULATIONS */}
+          <section>
+            <div className="glass rounded-2xl p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-4">
+                <ScrollText size={18} className="text-foreground/70" />
+                <h2 className="font-display font-bold text-xl text-foreground">
+                  KTU Regulations
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {SCHEMES.map((s) => (
+                  <div key={s.name} className="glass-sm rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-foreground text-sm">
+                        {s.name}
+                      </h3>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${s.tagColor}`}
+                      >
+                        {s.tag}
                       </span>
-                      <span className="text-muted-foreground font-normal text-xs">
-                        2025-26
-                      </span>
-                    </h3>
-                    <div className="space-y-2">
-                      {rows.map((row) => (
-                        <div
-                          key={row.event}
-                          className="flex items-center justify-between glass-sm rounded-lg px-3 py-2"
-                        >
-                          <span className="text-foreground text-xs">
-                            {row.event}
+                    </div>
+                    <p className="text-muted-foreground text-xs mb-3">
+                      {s.desc}
+                    </p>
+                    <div className="space-y-1">
+                      {[
+                        { label: "Semesters", value: s.sems },
+                        { label: "Credits", value: s.credits },
+                        { label: "CGPA", value: s.cgpa },
+                      ].map((item) => (
+                        <div key={item.label} className="flex gap-2">
+                          <span className="text-muted-foreground text-xs w-16 flex-shrink-0">
+                            {item.label}:
                           </span>
-                          <span className="text-muted-foreground text-xs font-medium">
-                            {row.date}
+                          <span className="text-foreground text-xs">
+                            {item.value}
                           </span>
                         </div>
                       ))}
@@ -978,96 +1479,20 @@ export function KTUPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
-
-          {/* Regulations */}
-          <section>
-            <div className="glass rounded-2xl p-6 sm:p-8">
-              <h2 className="font-display font-bold text-xl text-foreground mb-2">
-                KTU Regulations Overview
-              </h2>
-              <p className="text-muted-foreground text-sm mb-5">
-                KTU currently has three active schemes. Key rules apply to all
-                schemes:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                {SCHEMES.map((scheme) => (
-                  <div key={scheme.name} className="glass-sm rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-foreground text-sm">
-                        {scheme.name}
-                      </h3>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${scheme.tagColor}`}
-                      >
-                        {scheme.tag}
-                      </span>
-                    </div>
-                    <ul className="space-y-1.5">
-                      {scheme.points.map((pt) => (
-                        <li key={pt} className="flex items-start gap-1.5">
-                          <CheckCircle2
-                            size={11}
-                            className="text-emerald-400 mt-0.5 flex-shrink-0"
-                          />
-                          <span className="text-muted-foreground text-xs">
-                            {pt}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+              <div className="mt-4 glass-sm rounded-xl p-3">
+                <p className="text-muted-foreground text-xs">
+                  <span className="font-semibold text-foreground">
+                    Attendance Rule:
+                  </span>{" "}
+                  Minimum 75% attendance required in each subject. Students with
+                  less than 75% are detained from appearing in end semester
+                  exams.
+                </p>
               </div>
-              <div className="glass-sm rounded-xl p-4 mb-5">
-                <h3 className="font-semibold text-foreground text-sm mb-3">
-                  Common Rules (All Schemes)
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-                  {[
-                    ["Minimum Attendance", "75% per subject (mandatory)"],
-                    ["Theory Pass Mark", "40% in theory papers"],
-                    ["Practical Pass Mark", "50% in practical exams"],
-                    ["Grading Scale", "10-point CGPA scale"],
-                    ["Supplementary Exams", "Available after each semester"],
-                    ["Backlogs", "Cleared through supplementary exams"],
-                  ].map(([key, val]) => (
-                    <div key={key} className="flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/40 mt-1.5 flex-shrink-0" />
-                      <div>
-                        <span className="text-foreground text-xs font-medium">
-                          {key}:{" "}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {val}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <a
-                href="https://ktu.edu.in/regulation"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground"
-              >
-                <ExternalLink size={14} />
-                View KTU Regulations
-              </a>
             </div>
           </section>
         </div>
       </div>
-
-      <footer className="border-t border-white/10 px-4 sm:px-6 py-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-muted-foreground text-xs">
-            © {new Date().getFullYear()}. Built with love by SNGCE
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
