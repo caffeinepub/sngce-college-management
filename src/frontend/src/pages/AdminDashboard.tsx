@@ -1,4 +1,3 @@
-import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -27,7 +26,6 @@ import type {
 } from "../backend.d";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { useActor } from "../hooks/useActor";
 
 const CATEGORIES = [
   "Internal Circular",
@@ -384,9 +382,14 @@ export function AdminDashboard() {
 }
 
 function ClassifiedTab({ inputClass }: { inputClass: string }) {
-  const { actor } = useActor();
-  const [items, setItems] = useState<ClassifiedDoc[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<ClassifiedDoc[]>(() => {
+    try {
+      const stored = localStorage.getItem("sngce_classified_docs");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [content, setContent] = useState("");
@@ -394,19 +397,13 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
   const [showNewPass, setShowNewPass] = useState(false);
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (!actor) return;
-    setLoading(true);
-    (actor as any)
-      .getClassifiedDocs()
-      .then(setItems)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [actor]);
+  const saveItems = (updated: ClassifiedDoc[]) => {
+    setItems(updated);
+    localStorage.setItem("sngce_classified_docs", JSON.stringify(updated));
+  };
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actor) return;
     if (!title.trim() || !content.trim() || !uniquePassword.trim()) {
       toast.error("Please fill in all fields.");
       return;
@@ -425,9 +422,7 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
         minute: "2-digit",
       }),
     };
-    await (actor as any).addClassifiedDoc(newItem);
-    const updated = await (actor as any).getClassifiedDocs();
-    setItems(updated);
+    saveItems([...items, newItem]);
     setTitle("");
     setCategory(CATEGORIES[0]);
     setContent("");
@@ -435,11 +430,8 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
     toast.success("Classified item added.");
   };
 
-  const handleDelete = async (id: string) => {
-    if (!actor) return;
-    await (actor as any).removeClassifiedDoc(id);
-    const updated = await (actor as any).getClassifiedDocs();
-    setItems(updated);
+  const handleDelete = (id: string) => {
+    saveItems(items.filter((item) => item.id !== id));
     setRevealedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -578,20 +570,7 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
           <FileText size={15} className="text-foreground/70" />
           Classified Documents
         </h2>
-        {loading ? (
-          <div
-            className="flex flex-col gap-3"
-            data-ocid="admin.classified.loading_state"
-          >
-            {[1, 2, 3].map((k) => (
-              <div key={k} className="glass rounded-2xl p-5">
-                <Skeleton className="h-5 w-48 mb-2 bg-foreground/10" />
-                <Skeleton className="h-4 w-full mb-1 bg-foreground/10" />
-                <Skeleton className="h-4 w-3/4 bg-foreground/10" />
-              </div>
-            ))}
-          </div>
-        ) : items.length === 0 ? (
+        {items.length === 0 ? (
           <div
             className="glass rounded-2xl p-10 flex flex-col items-center gap-3 text-center"
             data-ocid="admin.classified.empty_state"
@@ -673,56 +652,55 @@ function ClassifiedTab({ inputClass }: { inputClass: string }) {
 }
 
 function CoursesTab({ inputClass }: { inputClass: string }) {
-  const { actor } = useActor();
-  const [courses, setCourses] = useState<AdminCourse[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [courses, setCourses] = useState<AdminCourse[]>(() => {
+    try {
+      const stored = localStorage.getItem("sngce_admin_courses");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_COURSES.map((c) => ({
+      branch: c.branch,
+      degree: c.degree,
+      durationYears: BigInt(c.durationYears),
+      intake: BigInt(c.intake),
+    }));
+  });
   const [branch, setBranch] = useState("");
   const [degree, setDegree] = useState("bTech");
   const [durationYears, setDurationYears] = useState(4);
   const [intake, setIntake] = useState(60);
 
-  useEffect(() => {
-    if (!actor) return;
-    setLoading(true);
-    (actor as any)
-      .getAdminCourses()
-      .then(async (result) => {
-        if (result.length === 0) {
-          await Promise.all(
-            DEFAULT_COURSES.map((c) =>
-              (actor as any).addAdminCourse({
-                branch: c.branch,
-                degree: c.degree,
-                durationYears: BigInt(c.durationYears),
-                intake: BigInt(c.intake),
-              }),
-            ),
-          );
-          const seeded = await (actor as any).getAdminCourses();
-          setCourses(seeded);
-        } else {
-          setCourses(result);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [actor]);
+  const saveCourses = (updated: AdminCourse[]) => {
+    setCourses(updated);
+    try {
+      localStorage.setItem(
+        "sngce_admin_courses",
+        JSON.stringify(
+          updated.map((c) => ({
+            ...c,
+            durationYears: Number(c.durationYears),
+            intake: Number(c.intake),
+          })),
+        ),
+      );
+    } catch {}
+  };
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actor) return;
     if (!branch.trim()) {
       toast.error("Branch name is required.");
       return;
     }
-    await (actor as any).addAdminCourse({
+    const newCourse: AdminCourse = {
       branch: branch.trim(),
       degree,
       durationYears: BigInt(durationYears),
       intake: BigInt(intake),
-    });
-    const updated = await (actor as any).getAdminCourses();
-    setCourses(updated);
+    };
+    saveCourses([...courses, newCourse]);
     setBranch("");
     setDegree("bTech");
     setDurationYears(4);
@@ -730,11 +708,8 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
     toast.success("Course added.");
   };
 
-  const handleRemove = async (courseBranch: string) => {
-    if (!actor) return;
-    await (actor as any).removeAdminCourse(courseBranch);
-    const updated = await (actor as any).getAdminCourses();
-    setCourses(updated);
+  const handleRemove = (courseBranch: string) => {
+    saveCourses(courses.filter((c) => c.branch !== courseBranch));
     toast.success("Course removed.");
   };
 
@@ -835,16 +810,7 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
             All Courses ({courses.length})
           </span>
         </div>
-        {loading ? (
-          <div
-            className="p-5 flex flex-col gap-2"
-            data-ocid="admin.courses.loading_state"
-          >
-            {[1, 2, 3, 4].map((k) => (
-              <Skeleton key={k} className="h-10 w-full bg-foreground/10" />
-            ))}
-          </div>
-        ) : courses.length === 0 ? (
+        {courses.length === 0 ? (
           <div
             className="p-10 text-center"
             data-ocid="admin.courses.empty_state"
@@ -907,53 +873,42 @@ function CoursesTab({ inputClass }: { inputClass: string }) {
 }
 
 function FeesTab({ inputClass }: { inputClass: string }) {
-  const { actor } = useActor();
-  const [fees, setFees] = useState<AdminFeeEntry[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [fees, setFees] = useState<AdminFeeEntry[]>(() => {
+    try {
+      const stored = localStorage.getItem("sngce_admin_fees");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_FEES.map((f) => ({
+      courseBranch: f.course.branch,
+      yearSemesterBreakdown: f.yearSemesterBreakdown,
+    }));
+  });
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editRows, setEditRows] = useState<
     { yearOrSemester: string; amount: number }[]
   >([]);
 
-  useEffect(() => {
-    if (!actor) return;
-    setLoading(true);
-    (actor as any)
-      .getAdminFeeEntries()
-      .then(async (result) => {
-        if (result.length === 0) {
-          await Promise.all(
-            DEFAULT_FEES.map((f) =>
-              (actor as any).upsertAdminFeeEntry({
-                courseBranch: f.course.branch,
-                yearSemesterBreakdown: f.yearSemesterBreakdown,
-              }),
-            ),
-          );
-          const seeded = await (actor as any).getAdminFeeEntries();
-          setFees(seeded);
-        } else {
-          setFees(result);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [actor]);
+  const saveFees = (updated: AdminFeeEntry[]) => {
+    setFees(updated);
+    try {
+      localStorage.setItem("sngce_admin_fees", JSON.stringify(updated));
+    } catch {}
+  };
 
   const openEdit = (idx: number) => {
     setEditIdx(idx);
     setEditRows(fees[idx].yearSemesterBreakdown.map((r) => ({ ...r })));
   };
 
-  const saveEdit = async () => {
-    if (editIdx === null || !actor) return;
-    const entry = fees[editIdx];
-    await (actor as any).upsertAdminFeeEntry({
-      courseBranch: entry.courseBranch,
-      yearSemesterBreakdown: editRows,
-    });
-    const updated = await (actor as any).getAdminFeeEntries();
-    setFees(updated);
+  const saveEdit = () => {
+    if (editIdx === null) return;
+    const updated = fees.map((f, i) =>
+      i === editIdx ? { ...f, yearSemesterBreakdown: editRows } : f,
+    );
+    saveFees(updated);
     setEditIdx(null);
     toast.success("Fees updated.");
   };
@@ -974,16 +929,7 @@ function FeesTab({ inputClass }: { inputClass: string }) {
             Fee Structures
           </span>
         </div>
-        {loading ? (
-          <div
-            className="p-5 flex flex-col gap-2"
-            data-ocid="admin.fees.loading_state"
-          >
-            {[1, 2, 3].map((k) => (
-              <Skeleton key={k} className="h-16 w-full bg-foreground/10" />
-            ))}
-          </div>
-        ) : fees.length === 0 ? (
+        {fees.length === 0 ? (
           <div className="p-10 text-center" data-ocid="admin.fees.empty_state">
             <p className="text-muted-foreground text-sm">
               No fee structures found.
@@ -1090,46 +1036,31 @@ function FeesTab({ inputClass }: { inputClass: string }) {
 }
 
 function FacultyTab({ inputClass }: { inputClass: string }) {
-  const { actor } = useActor();
-  const [faculty, setFaculty] = useState<AdminFacultyMember[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [faculty, setFaculty] = useState<AdminFacultyMember[]>(() => {
+    try {
+      const stored = localStorage.getItem("sngce_admin_faculty");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_FACULTY;
+  });
   const [name, setName] = useState("");
   const [qualification, setQualification] = useState("");
   const [designation, setDesignation] = useState("");
   const [department, setDepartment] = useState("");
   const [subjects, setSubjects] = useState("");
 
-  useEffect(() => {
-    if (!actor) return;
-    setLoading(true);
-    (actor as any)
-      .getAdminFacultyList()
-      .then(async (result) => {
-        if (result.length === 0) {
-          await Promise.all(
-            DEFAULT_FACULTY.map((f) =>
-              (actor as any).addAdminFaculty({
-                name: f.name,
-                qualification: f.qualification,
-                designation: f.designation,
-                department: f.department,
-                subjectsTaught: f.subjectsTaught,
-              }),
-            ),
-          );
-          const seeded = await (actor as any).getAdminFacultyList();
-          setFaculty(seeded);
-        } else {
-          setFaculty(result);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [actor]);
+  const saveFaculty = (updated: AdminFacultyMember[]) => {
+    setFaculty(updated);
+    try {
+      localStorage.setItem("sngce_admin_faculty", JSON.stringify(updated));
+    } catch {}
+  };
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actor) return;
     if (!name.trim() || !department.trim()) {
       toast.error("Name and department are required.");
       return;
@@ -1144,9 +1075,7 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
         .map((s) => s.trim())
         .filter(Boolean),
     };
-    await (actor as any).addAdminFaculty(newMember);
-    const updated = await (actor as any).getAdminFacultyList();
-    setFaculty(updated);
+    saveFaculty([...faculty, newMember]);
     setName("");
     setQualification("");
     setDesignation("");
@@ -1155,11 +1084,12 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
     toast.success("Faculty member added.");
   };
 
-  const handleRemove = async (memberName: string, memberDept: string) => {
-    if (!actor) return;
-    await (actor as any).removeAdminFaculty(memberName, memberDept);
-    const updated = await (actor as any).getAdminFacultyList();
-    setFaculty(updated);
+  const handleRemove = (memberName: string, memberDept: string) => {
+    saveFaculty(
+      faculty.filter(
+        (f) => !(f.name === memberName && f.department === memberDept),
+      ),
+    );
     toast.success("Faculty member removed.");
   };
 
@@ -1263,85 +1193,70 @@ function FacultyTab({ inputClass }: { inputClass: string }) {
         </form>
       </div>
 
-      {loading ? (
-        <div
-          className="flex flex-col gap-3"
-          data-ocid="admin.faculty.loading_state"
-        >
-          {[1, 2, 3].map((k) => (
-            <div key={k} className="glass rounded-2xl p-5">
-              <Skeleton className="h-5 w-32 mb-2 bg-foreground/10" />
-              <Skeleton className="h-4 w-48 mb-1 bg-foreground/10" />
-              <Skeleton className="h-3 w-full bg-foreground/10" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {departments.map((dept) => {
-            const members = faculty.filter((f) => f.department === dept);
-            return (
-              <div key={dept} className="glass rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
-                  <GraduationCap size={14} className="text-foreground/70" />
-                  <span className="font-semibold text-foreground text-sm">
-                    {dept}
-                  </span>
-                  <span className="glass-sm px-2 py-0.5 rounded-full text-[10px] text-muted-foreground ml-auto">
-                    {members.length}
-                  </span>
-                </div>
-                <div className="divide-y divide-white/5">
-                  {members.map((member) => {
-                    const globalIdx = faculty.indexOf(member);
-                    return (
-                      <div
-                        key={`${member.name}-${globalIdx}`}
-                        className="px-5 py-3 flex items-center justify-between gap-3 hover:bg-foreground/5"
-                        data-ocid={`admin.faculty.item.${globalIdx + 1}`}
-                      >
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground text-sm">
-                            {member.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {member.designation} · {member.qualification}
-                          </p>
-                          {member.subjectsTaught.length > 0 && (
-                            <p className="text-xs text-muted-foreground/60 mt-0.5">
-                              {member.subjectsTaught.join(", ")}
-                            </p>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemove(member.name, member.department)
-                          }
-                          data-ocid={`admin.faculty.delete_button.${globalIdx + 1}`}
-                          className="glass-btn p-1.5 text-destructive shrink-0"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+      <div className="flex flex-col gap-4">
+        {departments.map((dept) => {
+          const members = faculty.filter((f) => f.department === dept);
+          return (
+            <div key={dept} className="glass rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
+                <GraduationCap size={14} className="text-foreground/70" />
+                <span className="font-semibold text-foreground text-sm">
+                  {dept}
+                </span>
+                <span className="glass-sm px-2 py-0.5 rounded-full text-[10px] text-muted-foreground ml-auto">
+                  {members.length}
+                </span>
               </div>
-            );
-          })}
-          {faculty.length === 0 && (
-            <div
-              className="glass rounded-2xl p-10 text-center"
-              data-ocid="admin.faculty.empty_state"
-            >
-              <p className="text-muted-foreground text-sm">
-                No faculty members yet.
-              </p>
+              <div className="divide-y divide-white/5">
+                {members.map((member) => {
+                  const globalIdx = faculty.indexOf(member);
+                  return (
+                    <div
+                      key={`${member.name}-${globalIdx}`}
+                      className="px-5 py-3 flex items-center justify-between gap-3 hover:bg-foreground/5"
+                      data-ocid={`admin.faculty.item.${globalIdx + 1}`}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground text-sm">
+                          {member.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {member.designation} · {member.qualification}
+                        </p>
+                        {member.subjectsTaught.length > 0 && (
+                          <p className="text-xs text-muted-foreground/60 mt-0.5">
+                            {member.subjectsTaught.join(", ")}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleRemove(member.name, member.department)
+                        }
+                        data-ocid={`admin.faculty.delete_button.${globalIdx + 1}`}
+                        className="glass-btn p-1.5 text-destructive shrink-0"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          );
+        })}
+        {faculty.length === 0 && (
+          <div
+            className="glass rounded-2xl p-10 text-center"
+            data-ocid="admin.faculty.empty_state"
+          >
+            <p className="text-muted-foreground text-sm">
+              No faculty members yet.
+            </p>
+          </div>
+        )}
+      </div>
     </>
   );
 }
